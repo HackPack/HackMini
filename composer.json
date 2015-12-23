@@ -1,0 +1,26 @@
+{
+    "name": "hackpack/hackmini",
+    "description": "Mini framework for Hacklang.",
+    "type": "project",
+    "keywords": ["framework", "microframework", "micro", "psr7", "psr4", "router", "middleware"],
+    "require": {
+        "psr/http-message": "^1.0",
+        "hack-psr/psr7-http-message-hhi": "^0.2.0",
+        "fredemmott/definition-finder": "^0.3.0",
+        "zendframework/zend-diactoros": "^1.2"
+    },
+    "autoload": {
+      "psr-4": {
+        "HackPack\\HackMini\\": "src/"
+      }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Isaac Leinweber",
+            "email": "brotchen@gmail.com"
+        }
+    ],
+    "prefer-stable": true,
+    "minimum-stability": "dev"
+}
