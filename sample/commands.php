@@ -10,5 +10,10 @@ function commands() : Map<string, Definition>
             'options' => Vector{ },
             'handler' => fun('HackPack\HackMini\Sample\createUserFromCli'),
         ),
+        'user:show' => shape(
+            'arguments' => Vector{ },
+            'options' => Vector{ },
+            'handler' => class_meth('HackPack\HackMini\Sample\HandlerClass', 'someCommand'),
+        ),
     };
 }
