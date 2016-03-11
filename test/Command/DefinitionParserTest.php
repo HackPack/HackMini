@@ -151,6 +151,18 @@ function simplehandler(
 ) : int { }
 Hack;
 
+    private static string $nonStaticMethod = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('simple')>>
+    public function simplehandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+
     private static string $simpleMethod = <<<'Hack'
 <?hh
 class CommandClass {
@@ -397,6 +409,14 @@ Hack;
     public function optionWithSpace(Assert $assert) : void
     {
         $parser = $this->parse(self::$optionWithSpace);
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function nonStaticMethod(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$nonStaticMethod);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }

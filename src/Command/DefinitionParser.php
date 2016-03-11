@@ -107,6 +107,10 @@ final class DefinitionParser
                 return;
             }
 
+            if( ! $method->isStatic()) {
+                throw new \UnexpectedValueException('Command methods must be static.');
+            }
+
             $this->checkParameters($method->getParameters());
             $this->checkReturnType($method->getReturnType());
 
