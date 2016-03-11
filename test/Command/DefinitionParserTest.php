@@ -141,6 +141,35 @@ function complexhandler(
 ) : int { }
 Hack;
 
+    private static string $commandNameWithPipe = <<<'Hack'
+<?hh
+<<Command('s|imple')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+
+    private static string $commandNameWithSpace= <<<'Hack'
+<?hh
+<<Command('simpl e')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+    private static string $commandNameWithEqualSign = <<<'Hack'
+<?hh
+<<Command('simpl=e')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+
     private static string $simpleFunction = <<<'Hack'
 <?hh
 <<Command('simple')>>
@@ -417,6 +446,30 @@ Hack;
     public function nonStaticMethod(Assert $assert) : void
     {
         $parser = $this->parse(self::$nonStaticMethod);
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function commandNameWithPipe(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$commandNameWithPipe);
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function commandNameWithSpace(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$commandNameWithSpace);
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function commandNameWithEqualSign(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$commandNameWithEqualSign);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }

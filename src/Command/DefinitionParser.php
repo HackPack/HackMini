@@ -156,7 +156,19 @@ final class DefinitionParser
              );
         }
 
-        return (string)$commandAttribute->at(0);
+        $name = (string)$commandAttribute->at(0);
+
+        $match = [];
+        if(preg_match('/([ |=])/', $name, $match)) {
+            $invalidChar = $match[1];
+            $msg = ($invalidChar === ' ') ?
+                'Command names may not contain spaces.' :
+                'Command names may not contain "' . $invalidChar . '" characters.';
+
+            throw new \UnexpectedValueException($msg);
+        }
+
+        return $name;
     }
 
     private function defineOptions(?Vector<mixed> $options) : \ConstVector<OptionDefinition>
