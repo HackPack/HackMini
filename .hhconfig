@@ -1,0 +1,2 @@
+assume_php = true
+user_attributes = Provides ProvideMiddleware UseMiddleware Arguments Command Route Options Test Setup Covers IgnoreCoverage SuiteProvider TearDown Skip

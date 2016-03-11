@@ -1,5 +1,20 @@
 #!/usr/bin/env hhvm
 <?hh
 
-require_once(dirname(__DIR__) . '/src/bootstrapCli.php');
-bootstrapCli();
+// Find project root by looking for the composer autoloader
+$path = __DIR__;
+
+while($path !== '/') {
+    if(is_file($path . '/vendor/autoload.php')) {
+        require_once $path . '/vendor/autoload.php';
+        break;
+    }
+}
+
+if($path === '/') {
+    echo 'Unable to locate the Composer autoload file.  Please see the documentation for installing HackMini.';
+    exit 1;
+}
+
+$app = new HackPack\HackMini\CliApp(new Vector($argv), $path);
+exit($app->run());
