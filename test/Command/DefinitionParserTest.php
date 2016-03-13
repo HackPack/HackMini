@@ -109,9 +109,29 @@ function complexhandler(
 ) : int { }
 Hack;
 
-    private static string $optionWithEqualSign = <<<'Hack'
+    private static string $optionWithLongAlias = <<<'Hack'
 <?hh
-<<Command('complex'), Options('bad==')>>
+<<Command('complex'), Options('ba|ad')>>
+function complexhandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+
+    private static string $argumentsWithInvalidDefaults = <<<'Hack'
+<?hh
+<<Command('complex'), Arguments('one=default', 'two', 'three=three')>>
+function complexhandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+
+    private static string $argumentsWithDefaults = <<<'Hack'
+<?hh
+<<Command('complex'), Arguments('one', 'two=default', 'three=three')>>
 function complexhandler(
     FactoryContainer $c,
     HackPack\HackMini\Command\Request $r,
@@ -122,18 +142,6 @@ Hack;
     private static string $wrongArgumentNameType = <<<'Hack'
 <?hh
 <<Command('complex'), Arguments(1, 'two')>>
-function complexhandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $complexFunction = <<<'Hack'
-<?hh
-<<Command('complex'),
-    Options('o', 't|tough', 'long', 'u=', 'y|why='),
-    Arguments('one', 'two')>>
 function complexhandler(
     FactoryContainer $c,
     HackPack\HackMini\Command\Request $r,
@@ -197,6 +205,66 @@ Hack;
 class CommandClass {
     <<Command('simple')>>
     public static function simplehandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+
+    private static string $simpleOption = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('complex'), Options('simple')>>
+    public static function complexHandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+
+    private static string $optionWithAlias = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('complex'), Options('s|simple')>>
+    public static function complexHandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+
+    private static string $optionWithRequiredValue = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('complex'), Options('simple=')>>
+    public static function complexHandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+
+    private static string $optionWithDefaultValue = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('complex'), Options('simple=va l|u=e')>>
+    public static function complexHandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+
+    private static string $optionWithAliasAndValue = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('complex'), Options('s|va l|u=e')>>
+    public static function complexHandler(
         FactoryContainer $c,
         HackPack\HackMini\Command\Request $r,
         HackPack\HackMini\Command\UserInteraction $i,
@@ -275,80 +343,85 @@ Hack;
     }
 
     <<Test>>
-    public function parseComplexFunctionOptions(Assert $assert) : void
+    public function parseSimpleOption(Assert $assert) : void
     {
-        $parser = $this->parse(self::$complexFunction);
+        $parser = $this->parse(self::$simpleOption);
+
         $assert->int($parser->failures()->count())->eq(0);
 
-        $options = $parser
-            ->commands()
-            ->at(0)
-            ['options']
-            ;
+        $options = $parser->commands()->at(0)['options'];
+        $assert->int($options->count())->eq(1);
 
-        $assert->int($options->count())->eq(5);
         $this->checkOption(
             $assert,
             $options->at(0),
             shape(
-                'name' => 'o',
-                'alias' => 'o',
+                'name' => 'simple',
                 'value required' => false,
             ),
         );
+    }
+
+    <<Test>>
+    public function parseOptionWithAlias(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$optionWithAlias);
+
+        $assert->int($parser->failures()->count())->eq(0);
+
+        $options = $parser->commands()->at(0)['options'];
+        $assert->int($options->count())->eq(1);
+
         $this->checkOption(
             $assert,
-            $options->at(1),
+            $options->at(0),
             shape(
-                'name' => 'tough',
-                'alias' => 't',
+                'name' => 'simple',
+                'alias' => 's',
                 'value required' => false,
             ),
         );
+    }
+
+    <<Test>>
+    public function parseOptionWithRequiredValue(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$optionWithRequiredValue);
+
+        $assert->int($parser->failures()->count())->eq(0);
+
+        $options = $parser->commands()->at(0)['options'];
+        $assert->int($options->count())->eq(1);
+
         $this->checkOption(
             $assert,
-            $options->at(2),
+            $options->at(0),
             shape(
-                'name' => 'long',
-                'alias' => null,
-                'value required' => false,
-            ),
-        );
-        $this->checkOption(
-            $assert,
-            $options->at(3),
-            shape(
-                'name' => 'u',
-                'alias' => 'u',
-                'value required' => true,
-            ),
-        );
-        $this->checkOption(
-            $assert,
-            $options->at(4),
-            shape(
-                'name' => 'why',
-                'alias' => 'y',
+                'name' => 'simple',
                 'value required' => true,
             ),
         );
     }
 
     <<Test>>
-    public function parseComplexFunctionArguments(Assert $assert) : void
+    public function parseOptionWithDefaultValue(Assert $assert) : void
     {
-        $parser = $this->parse(self::$complexFunction);
+        $parser = $this->parse(self::$optionWithDefaultValue);
+
         $assert->int($parser->failures()->count())->eq(0);
 
-        $arguments = $parser
-            ->commands()
-            ->at(0)
-            ['arguments']
-        ;
+        $options = $parser->commands()->at(0)['options'];
+        $assert->int($options->count())->eq(1);
 
-        $assert->int($arguments->count())->eq(2);
-        $assert->string($arguments->at(0))->is('one');
-        $assert->string($arguments->at(1))->is('two');
+        $this->checkOption(
+            $assert,
+            $options->at(0),
+            shape(
+                'name' => 'simple',
+                'value required' => true,
+                'default' => 'va l|u=e',
+            ),
+        );
     }
 
     <<Test>>
@@ -419,14 +492,6 @@ Hack;
     }
 
     <<Test>>
-    public function optionWithEqualSign(Assert $assert) : void
-    {
-        $parser = $this->parse(self::$optionWithEqualSign);
-        $assert->int($parser->commands()->count())->eq(0);
-        $assert->int($parser->failures()->count())->eq(1);
-    }
-
-    <<Test>>
     public function optionWithPipe(Assert $assert) : void
     {
         $parser = $this->parse(self::$optionWithPipe);
@@ -438,6 +503,14 @@ Hack;
     public function optionWithSpace(Assert $assert) : void
     {
         $parser = $this->parse(self::$optionWithSpace);
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function optionWithLongAlias(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$optionWithLongAlias);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -475,6 +548,49 @@ Hack;
     }
 
     <<Test>>
+    public function argumentsWithDefaults(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$argumentsWithDefaults);
+        $assert->int($parser->commands()->count())->eq(1);
+        $assert->int($parser->failures()->count())->eq(0);
+
+        $arguments = $parser->commands()->at(0)['arguments'];
+        $assert->int($arguments->count())->eq(3);
+
+        $this->checkArgument(
+            $assert,
+            $arguments->at(0),
+            shape(
+                'name' => 'one',
+            ),
+        );
+        $this->checkArgument(
+            $assert,
+            $arguments->at(1),
+            shape(
+                'name' => 'two',
+                'default' => 'default',
+            ),
+        );
+        $this->checkArgument(
+            $assert,
+            $arguments->at(2),
+            shape(
+                'name' => 'three',
+                'default' => 'three',
+            ),
+        );
+    }
+
+    <<Test>>
+    public function argumentsWithInvalidDefaults(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$argumentsWithInvalidDefaults);
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
     public function wrongArgumentNameType(Assert $assert) : void
     {
         $parser = $this->parse(self::$wrongArgumentNameType);
@@ -498,9 +614,26 @@ Hack;
     {
         $assert->string($actual['name'])->is($expected['name']);
         $assert
+            ->mixed(Shapes::idx($actual, 'default'))
+            ->identicalTo(Shapes::idx($expected, 'default'))
+            ;
+        $assert
             ->mixed(Shapes::idx($actual, 'alias'))
             ->identicalTo(Shapes::idx($expected, 'alias'))
             ;
         $assert->bool($actual['value required'])->is($expected['value required']);
+    }
+
+    private function checkArgument(
+        Assert $assert,
+        ArgumentDefinition $actual,
+        ArgumentDefinition $expected,
+    ) : void
+    {
+        $assert->string($actual['name'])->is($expected['name']);
+        $assert
+            ->mixed(Shapes::idx($actual, 'default'))
+            ->identicalTo(Shapes::idx($expected, 'default'))
+            ;
     }
 }

@@ -10,14 +10,14 @@ use HackPack\HackMini\Message\Request as ServerRequest;
 use HackPack\HackMini\Message\Response;
 use FactoryContainer;
 
-<<Command('user:create'), Arguments('name=default', '...names'), Options('t|title=default'), UseMiddleware('showcolors')>>
+<<Command('user:create'), Arguments('name=default'), Options('t|title=default'), UseMiddleware('showcolors')>>
 function createUserFromCli(FactoryContainer $c, CommandRequest $req, UserInteraction $interact) : int
 {
     $userStore = $c->getUserStore();
 
     $title = $req->getFirst('title');
     $users = $req
-        ->at('names')
+        ->unnamedArguments()
         ->add($req->atFirst('name'))
         ->map($name ==> {
             $user = $userStore->create($name,$title);

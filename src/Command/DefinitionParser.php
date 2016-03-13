@@ -16,15 +16,6 @@ type ParseFailure = shape(
     'reason' => string,
 );
 
-type ParsedDefinition = shape(
-    'name' => string,
-    'function' => ?string,
-    'class' => ?string,
-    'method' => ?string,
-    'arguments' => \ConstVector<string>,
-    'options' => \ConstVector<OptionDefinition>,
-);
-
 final class DefinitionParser
 {
     public static function fromFileList(Vector<\SplFileInfo> $files) : this
@@ -185,14 +176,7 @@ final class DefinitionParser
                 );
             }
 
-            $valueRequired = false;
-            if(substr($option, -1) === '=') {
-                $valueRequired = true;
-                $option = substr($option, 0, -1);
-            }
-
             $definition = $this->parseOptionName($option);
-            $definition['value required'] = $valueRequired;
 
             $match = [];
             if(preg_match('/([ |=])/', $definition['name'], $match)) {
@@ -214,38 +198,94 @@ final class DefinitionParser
     ) : shape(
         'name' => string,
         'alias' => ?string,
+        'value required' => bool,
+        'default' => ?string,
     )
     {
-        $parts = explode('|', $name, 2);
+        if($this->optionHasAlias($name)) {
+            $parts = explode('|', $name, 2);
+            if(count($parts) < 2) {
+                throw new \UnexpectedValueException('All options must have a name.');
+            }
+            $alias = $parts[0];
+            $name = $parts[1];
 
-        if(count($parts) === 1) {
-            return shape(
-                'name' => $parts[0],
-                'alias' => strlen($parts[0]) === 1 ? $parts[0] : null,
-            );
+            if(strlen($alias) > 1) {
+                throw new \UnexpectedValueException('The alias of an option must be one character long.');
+            }
+
+        } else {
+            $alias = null;
         }
 
-        if(strlen($parts[0]) > 1) {
-             throw new \UnexpectedValueException('Option aliases must be one character');
+        if(strpos($name, '=') === false) {
+            $default = null;
+            $valueRequired = false;
+        } else {
+            $valueRequired = true;
+            $parts = explode('=', $name, 2);
+            $name = $parts[0];
+            $default = $parts[1] === '' ? null : $parts[1];
         }
 
-        return shape(
-            'name' => $parts[1],
-            'alias' => $parts[0],
+        $definition = shape(
+            'name' => $name,
+            'value required' => $valueRequired,
         );
+
+        if($alias !== null) {
+             $definition['alias'] = $alias;
+        }
+        if($default !== null) {
+            $definition['default'] = $default;
+        }
+
+        return $definition;
     }
 
-    private function defineArguments(?Vector<mixed> $arguments) : \ConstVector<string>
+    private function optionHasAlias(string $name) : bool
+    {
+        $pipepos = strpos($name, '|');
+
+        if($pipepos === false) {
+             return false;
+        }
+
+        $equalpos = strpos($name, '=');
+        if($equalpos === false) {
+            return true;
+        }
+
+        return $pipepos < $equalpos;
+    }
+
+    private function defineArguments(?Vector<mixed> $arguments) : \ConstVector<ArgumentDefinition>
     {
         if($arguments === null) {
              return Vector{};
         }
 
+        $required = Vector{true};
         return $arguments->map($a ==> {
-            if(is_string($a)) {
-                return $a;
+
+            if(!is_string($a)) {
+                throw new \UnexpectedValueException('The definition of an argument must be a string.');
             }
-            throw new \UnexpectedValueException('Argument names must be strings.');
+
+            if(strpos($a, '=') === false) {
+                if($required->at(0) === false) {
+                     throw new \UnexpectedValueException('All arguments with default values must be at the end of the list.');
+                }
+                return shape('name' => $a);
+            }
+
+            $required->set(0, false);
+
+            list($name, $default) = explode('=', $a, 2);
+            return shape(
+                'name' => $name,
+                'default' => $default,
+            );
         });
     }
 

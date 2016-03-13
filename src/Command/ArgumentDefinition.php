@@ -2,9 +2,7 @@
 
 namespace HackPack\HackMini\Command;
 
-type OptionDefinition = shape(
+type ArgumentDefinition = shape(
     'name' => string,
-    'alias' => ?string,
-    'value required' => bool,
     'default' => ?string,
 );

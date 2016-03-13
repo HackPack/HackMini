@@ -18,5 +18,5 @@ function buildCommands(?Vector<string> $includes, ?Vector<string> $excludes, str
     $fileList = listAllFiles($includes, $excludes);
     $parser = DefinitionParser::fromFileList($fileList);
     $builder = new Builder($parser->commands());
-    file_put_contents($builder->build(), $outpath);
+    file_put_contents($builder->render(), $outpath);
 }

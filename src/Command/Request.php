@@ -5,7 +5,7 @@ namespace HackPack\HackMini\Command;
 class Request
 {
     private Map<string, Vector<string>> $input = Map{};
-    private Vector<string> $argumentDefinitions = Vector{};
+    private Vector<ArgumentDefinition> $argumentDefinitions = Vector{};
     private Vector<OptionDefinition> $optionDefinitions = Vector{};
 
     public function __construct(
@@ -52,6 +52,11 @@ class Request
         return $values->at($values->count() - 1);
     }
 
+    public function unnamedArguments() : Vector<string>
+    {
+        return Vector{};
+    }
+
     public function projectRoot() : string
     {
          return $this->projectRoot;
@@ -62,7 +67,7 @@ class Request
         return $this->command;
     }
 
-    public function withArguments(Vector<string> $argumentDefinitions) : this
+    public function withArguments(Vector<ArgumentDefinition> $argumentDefinitions) : this
     {
         $new = clone $this;
         $new->argumentDefinitions = $argumentDefinitions;
