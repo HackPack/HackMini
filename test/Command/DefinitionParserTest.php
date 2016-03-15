@@ -159,7 +159,7 @@ function simplehandler(
 ) : int { }
 Hack;
 
-    private static string $commandNameWithSpace= <<<'Hack'
+    private static string $commandNameWithSpace = <<<'Hack'
 <?hh
 <<Command('simpl e')>>
 function simplehandler(
@@ -168,6 +168,7 @@ function simplehandler(
     HackPack\HackMini\Command\UserInteraction $i,
 ) : int { }
 Hack;
+
     private static string $commandNameWithEqualSign = <<<'Hack'
 <?hh
 <<Command('simpl=e')>>
@@ -428,11 +429,8 @@ Hack;
     public function commandMustHaveName(Assert $assert) : void
     {
         $parser = $this->parse(self::$noName);
-
         $assert->int($parser->commands()->count())->eq(0);
-
-        $failures = $parser->failures();
-        $assert->int($failures->count())->eq(1);
+        $assert->int($parser->failures()->count())->eq(1);
     }
 
     <<Test>>
