@@ -296,6 +296,82 @@ class Stuff {
 
 Hack;
 
+    private static string $repeatedOptionNames = <<<'Hack'
+<?hh
+<<Command('simple'), Options('name', 'name')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+
+    private static string $repeatedOptionAliases = <<<'Hack'
+<?hh
+<<Command('simple'), Options('n', 'n|name')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+
+    private static string $repeatedArgumentNames = <<<'Hack'
+<?hh
+<<Command('repeated-arguments'), Arguments('name', 'name')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+
+    private static string $repeatedArgumentOptionNames = <<<'Hack'
+<?hh
+<<Command('simple'), Arguments('name'), Options('name')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+
+    <<Test>>
+    public function repeatedArgumentOptionNames(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$repeatedArgumentOptionNames);
+
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function repeatedArgumentNames(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$repeatedArgumentNames);
+
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function repeatedOptionAliases(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$repeatedOptionAliases);
+
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function repeatedOptionNames(Assert $assert) : void
+    {
+        $parser = $this->parse(self::$repeatedOptionNames);
+
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
     <<Test>>
     public function ignoreNonCommands(Assert $assert) : void
     {

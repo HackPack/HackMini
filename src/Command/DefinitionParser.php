@@ -35,6 +35,7 @@ final class DefinitionParser
 
     private Vector<ParseFailure> $failures = Vector{};
     private Vector<ParsedDefinition> $commands = Vector{};
+    private Set<string> $names = Set{};
 
     public function __construct(
         \ConstVector<ScannedFunction> $functions,
@@ -69,11 +70,19 @@ final class DefinitionParser
                 $this->checkParameters($function->getParameters());
                 $this->checkReturnType($function->getReturnType());
 
+                $this->names->clear();
+
                 $this->commands->add(shape(
                     'name' => $commandName,
                     'function' => $function->getName(),
-                    'options' => $this->defineOptions($function->getAttributes()->get('Options')),
-                    'arguments' => $this->defineArguments($function->getAttributes()->get('Arguments')),
+                    'options' => $this->defineOptions(
+                        $commandName,
+                        $function->getAttributes()->get('Options')
+                    ),
+                    'arguments' => $this->defineArguments(
+                        $commandName,
+                        $function->getAttributes()->get('Arguments')
+                    ),
                 ));
 
             } catch (\UnexpectedValueException $e) {
@@ -105,12 +114,20 @@ final class DefinitionParser
             $this->checkParameters($method->getParameters());
             $this->checkReturnType($method->getReturnType());
 
+            $this->names->clear();
+
             $this->commands->add(shape(
                 'name' => $commandName,
                 'method' => $method->getName(),
                 'class' => $class->getName(),
-                'options' => $this->defineOptions($method->getAttributes()->get('Options')),
-                'arguments' => $this->defineArguments($method->getAttributes()->get('Arguments')),
+                'options' => $this->defineOptions(
+                    $commandName,
+                    $method->getAttributes()->get('Options')
+                ),
+                'arguments' => $this->defineArguments(
+                    $commandName,
+                    $method->getAttributes()->get('Arguments')
+                ),
             ));
 
         } catch (\UnexpectedValueException $e) {
@@ -162,7 +179,10 @@ final class DefinitionParser
         return $name;
     }
 
-    private function defineOptions(?Vector<mixed> $options) : \ConstVector<OptionDefinition>
+    private function defineOptions(
+        string $commandName,
+        ?Vector<mixed> $options
+    ) : \ConstVector<OptionDefinition>
     {
         if($options === null) {
             return Vector{};
@@ -176,7 +196,7 @@ final class DefinitionParser
                 );
             }
 
-            $definition = $this->parseOptionName($option);
+            $definition = $this->parseOptionName($commandName, $option);
 
             $match = [];
             if(preg_match('/([ |=])/', $definition['name'], $match)) {
@@ -194,6 +214,7 @@ final class DefinitionParser
     }
 
     private function parseOptionName(
+        string $commandName,
         string $name,
     ) : shape(
         'name' => string,
@@ -233,9 +254,13 @@ final class DefinitionParser
             'value required' => $valueRequired,
         );
 
+        $this->checkName($commandName, $name, $name !== $alias);
+
         if($alias !== null) {
-             $definition['alias'] = $alias;
+            $this->checkName($commandName, $alias, true);
+            $definition['alias'] = $alias;
         }
+
         if($default !== null) {
             $definition['default'] = $default;
         }
@@ -259,7 +284,10 @@ final class DefinitionParser
         return $pipepos < $equalpos;
     }
 
-    private function defineArguments(?Vector<mixed> $arguments) : \ConstVector<ArgumentDefinition>
+    private function defineArguments(
+        string $commandName,
+        ?Vector<mixed> $arguments,
+    ) : \ConstVector<ArgumentDefinition>
     {
         if($arguments === null) {
              return Vector{};
@@ -276,12 +304,14 @@ final class DefinitionParser
                 if($required->at(0) === false) {
                      throw new \UnexpectedValueException('All arguments with default values must be at the end of the list.');
                 }
+                $this->checkName($commandName, $a, true);
                 return shape('name' => $a);
             }
 
             $required->set(0, false);
 
             list($name, $default) = explode('=', $a, 2);
+
             return shape(
                 'name' => $name,
                 'default' => $default,
@@ -323,6 +353,21 @@ final class DefinitionParser
             throw new \UnexpectedValueException(
                  'Command handlers must have a return type of "int"'
             );
+        }
+    }
+
+    private function checkName(string $commandName, string $name, bool $add) : void
+    {
+        if($this->names->contains($name)) {
+            throw new \UnexpectedValueException(sprintf(
+                'Command "%s" contains two arguments/options named "%s".  Option/argument names must be unique.',
+                $commandName,
+                $name,
+            ));
+        }
+
+        if($add) {
+            $this->names->add($name);
         }
     }
 }
