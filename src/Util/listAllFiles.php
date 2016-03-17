@@ -7,8 +7,8 @@ use \SplFileInfo;
 
 <<__Memoize>>
 function listAllFiles(
-    ?Vector<string> $include,
-    ?Vector<string> $exclude,
+    ?\ConstVector<string> $include,
+    ?\ConstVector<string> $exclude,
     bool $skipHiddenFiles = true,
 ) : Vector<SplFileInfo>
 {

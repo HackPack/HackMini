@@ -17,7 +17,7 @@ function createUserFromCli(FactoryContainer $c, CommandRequest $req, UserInterac
 
     $title = $req->getFirst('title');
     $users = $req
-        ->unnamedArguments()
+        ->unnamedArguments()->toVector()
         ->add($req->atFirst('name'))
         ->map($name ==> {
             $user = $userStore->create($name,$title);

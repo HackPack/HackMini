@@ -10,13 +10,11 @@ use function HackPack\HackMini\Util\listAllFiles;
 <<Command('commands:build'), Options('i|include-path=', 'e|exclude-path=')>>
 function buildCommandsCommand(\FactoryContainer $c, Request $req, UserInteraction $rsp) : void
 {
-    buildCommands($req->get('include-path'), $req->get('exclude-path'), $req->projectRoot() . '/commands.php');
-}
-
-function buildCommands(?Vector<string> $includes, ?Vector<string> $excludes, string $outpath) : void
-{
-    $fileList = listAllFiles($includes, $excludes);
+    $fileList = listAllFiles(
+        $req->get('include-path'),
+        $req->get('exclude-path'),
+    );
     $parser = DefinitionParser::fromFileList($fileList);
     $builder = new Builder($parser->commands());
-    file_put_contents($builder->render(), $outpath);
+    file_put_contents($builder->render(), $req->projectRoot() . '/commands.php');
 }

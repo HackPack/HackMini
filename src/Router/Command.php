@@ -19,15 +19,11 @@ class Command
         private Vector<string> $globalMiddleware,
     )
     {
-        if($commandList->isEmpty()) {
-            // TODO: run the commands:build command and try again in a subshell
-        }
-
     }
 
     public function dispatch(Request $req, UserInteraction $interaction) : int
     {
-        $commandDefinition = $this->commandList->get($req->commandText());
+        $commandDefinition = $this->commandList->get($req->name());
 
         if($commandDefinition === null) {
             // TODO: Show command not found error

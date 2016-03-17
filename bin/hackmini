@@ -1,6 +1,10 @@
 #!/usr/bin/env hhvm
 <?hh
 
+if(php_sapi_name() !== 'cli') {
+    exit('Use this executable from the command line only.');
+}
+
 // Find project root by looking for the composer autoloader
 $path = __DIR__;
 
@@ -16,5 +20,7 @@ if($path === '/') {
     exit 1;
 }
 
-$app = new HackPack\HackMini\CliApp(new Vector($argv), $path);
+$request = HackPack\HackMini\Command\Request::fromEnv($argv, $path);
+$interaction = new HackPack\HackMini\Command\UserInteraction();
+$app = new HackPack\HackMini\CliApp($request, $interaction);
 exit($app->run());
