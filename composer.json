@@ -6,7 +6,8 @@
     "require": {
         "psr/http-message": "^1.0",
         "fredemmott/definition-finder": "^1.1",
-        "hack-psr/psr7-http-message-hhi": "^0.2.0"
+        "hack-psr/psr7-http-message-hhi": "^0.2.0",
+        "fredemmott/hhvm-autoload": "^0.1.0"
     },
     "autoload": {
       "psr-4": {

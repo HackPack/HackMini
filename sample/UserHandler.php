@@ -11,7 +11,11 @@ use HackPack\HackMini\Message\Response;
 use FactoryContainer;
 
 <<Command('user:create'), Arguments('name=default'), Options('t|title=default'), UseMiddleware('showcolors')>>
-function createUserFromCli(FactoryContainer $c, CommandRequest $req, UserInteraction $interact) : int
+function createUserFromCli(
+    \FactoryContainer $c,
+    \HackPack\HackMini\Command\Request $req,
+    \HackPack\HackMini\Command\UserInteraction $interact,
+) : int
 {
     $userStore = $c->getUserStore();
 

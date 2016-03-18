@@ -6,12 +6,16 @@ require_once __DIR__ . '/every.php';
 use \SplFileInfo;
 
 <<__Memoize>>
-function listAllFiles(
+function listPhpFiles(
     ?\ConstVector<string> $include,
     ?\ConstVector<string> $exclude,
     bool $skipHiddenFiles = true,
+    ?\ConstSet<string> $allowedExtensions = null,
 ) : Vector<SplFileInfo>
 {
+    if($allowedExtensions === null) {
+        $allowedExtensions = Set{'php', 'hh'};
+    }
     if($include === null || $include->isEmpty()) {
         $include = Vector{getcwd()};
     }
@@ -27,6 +31,10 @@ function listAllFiles(
 
         if($skipHiddenFiles && substr($path->getFilename(), 0, 1) === '.') {
             return false;
+        }
+
+        if($path->isFile() && !$allowedExtensions->contains($path->getExtension())) {
+             return false;
         }
 
         return every(

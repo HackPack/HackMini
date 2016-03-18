@@ -325,7 +325,7 @@ final class DefinitionParser
             ->filter($p ==> ! $p->isOptional())
             ->map($p ==> {
                 $name = $p->getTypehint()?->getTypeName();
-                return $name === null ? '' : $name;
+                return $name === null ? '' : ltrim($name, '\\');
             })
             ;
 

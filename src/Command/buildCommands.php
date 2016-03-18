@@ -5,16 +5,32 @@ namespace HackPack\HackMini\Command;
 use HackPack\HackMini\Command\Request;
 use HackPack\HackMini\Command\UserInteraction;
 
-use function HackPack\HackMini\Util\listAllFiles;
+use HackPack\HackMini\Util;
 
 <<Command('commands:build'), Options('i|include-path=', 'e|exclude-path=')>>
-function buildCommandsCommand(\FactoryContainer $c, Request $req, UserInteraction $rsp) : void
+function buildCommandsCommand(
+    \FactoryContainer $c,
+    \HackPack\HackMini\Command\Request $req,
+    \HackPack\HackMini\Command\UserInteraction $rsp,
+) : int
 {
-    $fileList = listAllFiles(
+    $fileList = Util\listPhpFiles(
         $req->get('include-path'),
         $req->get('exclude-path'),
     );
+    return buildCommands($fileList,  $req->projectRoot() . '/commands.php');
+}
+
+function buildCommands(Vector<\SplFileInfo> $fileList, string $outfile) : int
+{
     $parser = DefinitionParser::fromFileList($fileList);
+    if($parser->failures()) {
+        var_dump($parser->failures());
+        return 1;
+    }
     $builder = new Builder($parser->commands());
-    file_put_contents($builder->render(), $req->projectRoot() . '/commands.php');
+    $fp = fopen($outfile, 'w');
+    fwrite($fp, $builder->render());
+    fclose($fp);
+    return 0;
 }

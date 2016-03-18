@@ -10,14 +10,25 @@ class CliApp
         private Command\UserInteraction $interaction,
     )
     {
+        if(!function_exists('commands')) {
+            $this->buildCommands();
+        }
+
+        if(!function_exists('globalCliMiddleware')) {
+            $this->buildGlobalMiddleware();
+        }
+
+        if(!class_exists('FactoryContainer')) {
+            $this->buildFactoryContainer();
+        }
     }
 
     public function run() : int
     {
         $router = new Router\Command(
             new \FactoryContainer(),
-            $this->commandList(),
-            globalCliMiddleware()
+            \commands(),
+            \globalCliMiddleware()
         );
 
         try {
@@ -31,21 +42,22 @@ class CliApp
         }
     }
 
-    private function commandList() : Map<string, Command\Definition>
-    {
-        $list = commands();
-        if($list->isEmpty()) {
-            $this->buildCommands();
-
-            // Should never get here
-            exit(1);
-        }
-
-        return $list;
-    }
-
     private function buildCommands() : void
     {
-         // TODO: invoke the commands:build command and try again in a subshell
+         $this->interaction->showLine('Scanning project for commands.');
+         $outfile = $this->request->projectRoot() . '/commands.php';
+         $dirsToScan = $this->request->projectRoot();
+         $filesToScan = Util\listPhpFiles(Vector{$dirsToScan}, null);
+         if (Command\buildCommands($filesToScan,$outfile)) {
+              exit(1);
+         };
+    }
+
+    private function buildGlobalMiddleware() : void
+    {
+    }
+
+    private function buildFactoryContainer() : void
+    {
     }
 }
