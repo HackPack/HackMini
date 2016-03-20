@@ -1,6 +1,7 @@
 {
     "roots": [
         "src/",
+        "build/",
         "test/"
     ],
     "includeVendor": true

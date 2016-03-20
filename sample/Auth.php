@@ -11,6 +11,7 @@ final class Auth
 
     private ?User $me = null;
 
+    <<Provides('auth')>>
     public static function factory(FactoryContainer $c) : this
     {
         return new static($c->getUserStore());

@@ -43,6 +43,22 @@ function commands() : Map<string, Definition>
             },
             'handler' => fun('HackPack\HackMini\Command\buildCommandsCommand'),
         ),
+        'container:build' => shape(
+            'arguments' => Vector{},
+            'options' => Vector{
+                shape(
+                    'name' => 'include-path',
+                    'alias' => 'i',
+                    'value required' => true,
+                ),
+                shape(
+                    'name' => 'exclude-path',
+                    'alias' => 'e',
+                    'value required' => true,
+                ),
+            },
+            'handler' => fun('HackPack\HackMini\Container\buildContainerCommand'),
+        ),
         'routes:build' => shape(
             'arguments' => Vector{},
             'options' => Vector{
