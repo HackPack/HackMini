@@ -11,147 +11,12 @@ use HackPack\HackMini\Command\ArgumentDefinition;
 
 class DefinitionParserTest
 {
-    private static string $noParams = <<<'Hack'
+    <<Test>>
+    public function repeatedArgumentOptionNames(Assert $assert) : void
+    {
+        $code = <<<'Hack'
 <?hh
-<<Command('noparams')>>
-function noparams() : int {}
-Hack;
-
-    private static string $wrongFirstParam = <<<'Hack'
-<?hh
-<<Command('wrongfirst')>>
-function wrong(
-    int $wrong,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $wrongSecondParam = <<<'Hack'
-<?hh
-<<Command('wrongsecond')>>
-function wrong(
-    FactoryContainer $c,
-    int $wrong,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $wrongThirdParam = <<<'Hack'
-<?hh
-<<Command('wrongthird')>>
-function wrong(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    int $wrong,
-) : int { }
-Hack;
-
-    private static string $tooManyParams = <<<'Hack'
-<?hh
-<<Command('toomany')>>
-function toomany(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-    int $more,
-) : int { }
-Hack;
-
-    private static string $enoughRequiredParams = <<<'Hack'
-<?hh
-<<Command('toomany')>>
-function toomany(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-    int $more = 0,
-) : int { }
-Hack;
-
-    private static string $noName = <<<'Hack'
-<?hh
-<<Command>>
-function nonamecommand(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $wrongReturn = <<<'Hack'
-<?hh
-<<Command('simple')>>
-function simplehandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : void { }
-Hack;
-
-    private static string $optionWithSpace = <<<'Hack'
-<?hh
-<<Command('complex'), Options('b|b ad =')>>
-function complexhandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $optionWithPipe = <<<'Hack'
-<?hh
-<<Command('complex'), Options('b|aa|d=')>>
-function complexhandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $optionWithLongAlias = <<<'Hack'
-<?hh
-<<Command('complex'), Options('ba|ad')>>
-function complexhandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $argumentsWithInvalidDefaults = <<<'Hack'
-<?hh
-<<Command('complex'), Arguments('one=default', 'two', 'three=three')>>
-function complexhandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $argumentsWithDefaults = <<<'Hack'
-<?hh
-<<Command('complex'), Arguments('one', 'two=default', 'three=three')>>
-function complexhandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $wrongArgumentNameType = <<<'Hack'
-<?hh
-<<Command('complex'), Arguments(1, 'two')>>
-function complexhandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $commandNameWithPipe = <<<'Hack'
-<?hh
-<<Command('s|imple')>>
+<<Command('simple'), Arguments('name'), Options('name')>>
 function simplehandler(
     FactoryContainer $c,
     HackPack\HackMini\Command\Request $r,
@@ -159,121 +24,70 @@ function simplehandler(
 ) : int { }
 Hack;
 
-    private static string $commandNameWithSpace = <<<'Hack'
+        $parser = $this->parse($code);
+
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function repeatedArgumentNames(Assert $assert) : void
+    {
+        $code = <<<'Hack'
 <?hh
-<<Command('simpl e')>>
+<<Command('repeated-arguments'), Arguments('name', 'name')>>
 function simplehandler(
     FactoryContainer $c,
     HackPack\HackMini\Command\Request $r,
     HackPack\HackMini\Command\UserInteraction $i,
 ) : int { }
 Hack;
+        $parser = $this->parse($code);
 
-    private static string $commandNameWithEqualSign = <<<'Hack'
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function repeatedOptionAliases(Assert $assert) : void
+    {
+        $code = <<<'Hack'
 <?hh
-<<Command('simpl=e')>>
+<<Command('simple'), Options('n', 'n|name')>>
 function simplehandler(
     FactoryContainer $c,
     HackPack\HackMini\Command\Request $r,
     HackPack\HackMini\Command\UserInteraction $i,
 ) : int { }
 Hack;
+        $parser = $this->parse($code);
 
-    private static string $simpleFunction = <<<'Hack'
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
+
+    <<Test>>
+    public function repeatedOptionNames(Assert $assert) : void
+    {
+        $code = <<<'Hack'
 <?hh
-<<Command('simple')>>
+<<Command('simple'), Options('name', 'name')>>
 function simplehandler(
     FactoryContainer $c,
     HackPack\HackMini\Command\Request $r,
     HackPack\HackMini\Command\UserInteraction $i,
 ) : int { }
 Hack;
+        $parser = $this->parse($code);
 
-    private static string $nonStaticMethod = <<<'Hack'
-<?hh
-class CommandClass {
-    <<Command('simple')>>
-    public function simplehandler(
-        FactoryContainer $c,
-        HackPack\HackMini\Command\Request $r,
-        HackPack\HackMini\Command\UserInteraction $i,
-    ) : int { }
-}
-Hack;
+        $assert->int($parser->commands()->count())->eq(0);
+        $assert->int($parser->failures()->count())->eq(1);
+    }
 
-    private static string $simpleMethod = <<<'Hack'
-<?hh
-class CommandClass {
-    <<Command('simple')>>
-    public static function simplehandler(
-        FactoryContainer $c,
-        HackPack\HackMini\Command\Request $r,
-        HackPack\HackMini\Command\UserInteraction $i,
-    ) : int { }
-}
-Hack;
-
-    private static string $simpleOption = <<<'Hack'
-<?hh
-class CommandClass {
-    <<Command('complex'), Options('simple')>>
-    public static function complexHandler(
-        FactoryContainer $c,
-        HackPack\HackMini\Command\Request $r,
-        HackPack\HackMini\Command\UserInteraction $i,
-    ) : int { }
-}
-Hack;
-
-    private static string $optionWithAlias = <<<'Hack'
-<?hh
-class CommandClass {
-    <<Command('complex'), Options('s|simple')>>
-    public static function complexHandler(
-        FactoryContainer $c,
-        HackPack\HackMini\Command\Request $r,
-        HackPack\HackMini\Command\UserInteraction $i,
-    ) : int { }
-}
-Hack;
-
-    private static string $optionWithRequiredValue = <<<'Hack'
-<?hh
-class CommandClass {
-    <<Command('complex'), Options('simple=')>>
-    public static function complexHandler(
-        FactoryContainer $c,
-        HackPack\HackMini\Command\Request $r,
-        HackPack\HackMini\Command\UserInteraction $i,
-    ) : int { }
-}
-Hack;
-
-    private static string $optionWithDefaultValue = <<<'Hack'
-<?hh
-class CommandClass {
-    <<Command('complex'), Options('simple=va l|u=e')>>
-    public static function complexHandler(
-        FactoryContainer $c,
-        HackPack\HackMini\Command\Request $r,
-        HackPack\HackMini\Command\UserInteraction $i,
-    ) : int { }
-}
-Hack;
-
-    private static string $optionWithAliasAndValue = <<<'Hack'
-<?hh
-class CommandClass {
-    <<Command('complex'), Options('s|va l|u=e')>>
-    public static function complexHandler(
-        FactoryContainer $c,
-        HackPack\HackMini\Command\Request $r,
-        HackPack\HackMini\Command\UserInteraction $i,
-    ) : int { }
-}
-Hack;
-
-    private static string $none = <<<'Hack'
+    <<Test>>
+    public function ignoreNonCommands(Assert $assert) : void
+    {
+        $code = <<<'Hack'
 <?hh
 function notacommand(
     FactoryContainer $c,
@@ -295,87 +109,7 @@ class Stuff {
 }
 
 Hack;
-
-    private static string $repeatedOptionNames = <<<'Hack'
-<?hh
-<<Command('simple'), Options('name', 'name')>>
-function simplehandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $repeatedOptionAliases = <<<'Hack'
-<?hh
-<<Command('simple'), Options('n', 'n|name')>>
-function simplehandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $repeatedArgumentNames = <<<'Hack'
-<?hh
-<<Command('repeated-arguments'), Arguments('name', 'name')>>
-function simplehandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    private static string $repeatedArgumentOptionNames = <<<'Hack'
-<?hh
-<<Command('simple'), Arguments('name'), Options('name')>>
-function simplehandler(
-    FactoryContainer $c,
-    HackPack\HackMini\Command\Request $r,
-    HackPack\HackMini\Command\UserInteraction $i,
-) : int { }
-Hack;
-
-    <<Test>>
-    public function repeatedArgumentOptionNames(Assert $assert) : void
-    {
-        $parser = $this->parse(self::$repeatedArgumentOptionNames);
-
-        $assert->int($parser->commands()->count())->eq(0);
-        $assert->int($parser->failures()->count())->eq(1);
-    }
-
-    <<Test>>
-    public function repeatedArgumentNames(Assert $assert) : void
-    {
-        $parser = $this->parse(self::$repeatedArgumentNames);
-
-        $assert->int($parser->commands()->count())->eq(0);
-        $assert->int($parser->failures()->count())->eq(1);
-    }
-
-    <<Test>>
-    public function repeatedOptionAliases(Assert $assert) : void
-    {
-        $parser = $this->parse(self::$repeatedOptionAliases);
-
-        $assert->int($parser->commands()->count())->eq(0);
-        $assert->int($parser->failures()->count())->eq(1);
-    }
-
-    <<Test>>
-    public function repeatedOptionNames(Assert $assert) : void
-    {
-        $parser = $this->parse(self::$repeatedOptionNames);
-
-        $assert->int($parser->commands()->count())->eq(0);
-        $assert->int($parser->failures()->count())->eq(1);
-    }
-
-    <<Test>>
-    public function ignoreNonCommands(Assert $assert) : void
-    {
-        $parser = $this->parse(self::$none);
+        $parser = $this->parse($code);
 
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(0);
@@ -384,7 +118,16 @@ Hack;
     <<Test>>
     public function parseSimpleFunction(Assert $assert) : void
     {
-        $parser = $this->parse(self::$simpleFunction);
+        $code = <<<'Hack'
+<?hh
+<<Command('simple')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
 
         $assert->int($parser->failures()->count())->eq(0);
 
@@ -403,7 +146,19 @@ Hack;
     <<Test>>
     public function parseSimpleMethod(Assert $assert) : void
     {
-        $parser = $this->parse(self::$simpleMethod);
+        $code = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('simple')>>
+    public static function simplehandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+
+        $parser = $this->parse($code);
 
         $assert->int($parser->failures()->count())->eq(0);
 
@@ -422,7 +177,18 @@ Hack;
     <<Test>>
     public function parseSimpleOption(Assert $assert) : void
     {
-        $parser = $this->parse(self::$simpleOption);
+        $code = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('complex'), Options('simple')>>
+    public static function complexHandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+        $parser = $this->parse($code);
 
         $assert->int($parser->failures()->count())->eq(0);
 
@@ -442,7 +208,18 @@ Hack;
     <<Test>>
     public function parseOptionWithAlias(Assert $assert) : void
     {
-        $parser = $this->parse(self::$optionWithAlias);
+        $code = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('complex'), Options('s|simple')>>
+    public static function complexHandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+        $parser = $this->parse($code);
 
         $assert->int($parser->failures()->count())->eq(0);
 
@@ -463,7 +240,18 @@ Hack;
     <<Test>>
     public function parseOptionWithRequiredValue(Assert $assert) : void
     {
-        $parser = $this->parse(self::$optionWithRequiredValue);
+        $code = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('complex'), Options('simple=')>>
+    public static function complexHandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+        $parser = $this->parse($code);
 
         $assert->int($parser->failures()->count())->eq(0);
 
@@ -483,7 +271,18 @@ Hack;
     <<Test>>
     public function parseOptionWithDefaultValue(Assert $assert) : void
     {
-        $parser = $this->parse(self::$optionWithDefaultValue);
+        $code = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('complex'), Options('simple=va l|u=e')>>
+    public static function complexHandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+        $parser = $this->parse($code);
 
         $assert->int($parser->failures()->count())->eq(0);
 
@@ -504,7 +303,16 @@ Hack;
     <<Test>>
     public function commandMustHaveName(Assert $assert) : void
     {
-        $parser = $this->parse(self::$noName);
+        $code = <<<'Hack'
+<?hh
+<<Command>>
+function nonamecommand(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -512,7 +320,17 @@ Hack;
     <<Test>>
     public function parameterCountCheck(Assert $assert) : void
     {
-        $parser = $this->parse(self::$tooManyParams);
+        $code = <<<'Hack'
+<?hh
+<<Command('toomany')>>
+function toomany(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+    int $more,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -520,7 +338,12 @@ Hack;
     <<Test>>
     public function paramsMustBePresent(Assert $assert) : void
     {
-        $parser = $this->parse(self::$noParams);
+        $code = <<<'Hack'
+<?hh
+<<Command('noparams')>>
+function noparams() : int {}
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -528,7 +351,16 @@ Hack;
     <<Test>>
     public function firstParamCheck(Assert $assert) : void
     {
-        $parser = $this->parse(self::$wrongFirstParam);
+        $code = <<<'Hack'
+<?hh
+<<Command('wrongfirst')>>
+function wrong(
+    int $wrong,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -536,7 +368,16 @@ Hack;
     <<Test>>
     public function secondParamCheck(Assert $assert) : void
     {
-        $parser = $this->parse(self::$wrongSecondParam);
+        $code = <<<'Hack'
+<?hh
+<<Command('wrongsecond')>>
+function wrong(
+    FactoryContainer $c,
+    int $wrong,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -544,7 +385,16 @@ Hack;
     <<Test>>
     public function thirdParamCheck(Assert $assert) : void
     {
-        $parser = $this->parse(self::$wrongThirdParam);
+        $code = <<<'Hack'
+<?hh
+<<Command('wrongthird')>>
+function wrong(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    int $wrong,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -552,7 +402,16 @@ Hack;
     <<Test>>
     public function returnTypeCheck(Assert $assert) : void
     {
-        $parser = $this->parse(self::$wrongReturn);
+        $code = <<<'Hack'
+<?hh
+<<Command('simple')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : void { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -560,7 +419,17 @@ Hack;
     <<Test>>
     public function extraOptionalParamsAllowed(Assert $assert) : void
     {
-        $parser = $this->parse(self::$enoughRequiredParams);
+        $code = <<<'Hack'
+<?hh
+<<Command('toomany')>>
+function toomany(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+    int $more = 0,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(1);
         $assert->int($parser->failures()->count())->eq(0);
     }
@@ -568,7 +437,16 @@ Hack;
     <<Test>>
     public function optionWithPipe(Assert $assert) : void
     {
-        $parser = $this->parse(self::$optionWithPipe);
+        $code = <<<'Hack'
+<?hh
+<<Command('complex'), Options('b|aa|d=')>>
+function complexhandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -576,7 +454,16 @@ Hack;
     <<Test>>
     public function optionWithSpace(Assert $assert) : void
     {
-        $parser = $this->parse(self::$optionWithSpace);
+        $code = <<<'Hack'
+<?hh
+<<Command('complex'), Options('b|b ad =')>>
+function complexhandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -584,7 +471,16 @@ Hack;
     <<Test>>
     public function optionWithLongAlias(Assert $assert) : void
     {
-        $parser = $this->parse(self::$optionWithLongAlias);
+        $code = <<<'Hack'
+<?hh
+<<Command('complex'), Options('ba|ad')>>
+function complexhandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -592,7 +488,18 @@ Hack;
     <<Test>>
     public function nonStaticMethod(Assert $assert) : void
     {
-        $parser = $this->parse(self::$nonStaticMethod);
+        $code = <<<'Hack'
+<?hh
+class CommandClass {
+    <<Command('simple')>>
+    public function simplehandler(
+        FactoryContainer $c,
+        HackPack\HackMini\Command\Request $r,
+        HackPack\HackMini\Command\UserInteraction $i,
+    ) : int { }
+}
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -600,7 +507,16 @@ Hack;
     <<Test>>
     public function commandNameWithPipe(Assert $assert) : void
     {
-        $parser = $this->parse(self::$commandNameWithPipe);
+        $code = <<<'Hack'
+<?hh
+<<Command('s|imple')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -608,7 +524,16 @@ Hack;
     <<Test>>
     public function commandNameWithSpace(Assert $assert) : void
     {
-        $parser = $this->parse(self::$commandNameWithSpace);
+        $code = <<<'Hack'
+<?hh
+<<Command('simpl e')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -616,7 +541,16 @@ Hack;
     <<Test>>
     public function commandNameWithEqualSign(Assert $assert) : void
     {
-        $parser = $this->parse(self::$commandNameWithEqualSign);
+        $code = <<<'Hack'
+<?hh
+<<Command('simpl=e')>>
+function simplehandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -624,7 +558,16 @@ Hack;
     <<Test>>
     public function argumentsWithDefaults(Assert $assert) : void
     {
-        $parser = $this->parse(self::$argumentsWithDefaults);
+        $code = <<<'Hack'
+<?hh
+<<Command('complex'), Arguments('one', 'two=default', 'three=three')>>
+function complexhandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(1);
         $assert->int($parser->failures()->count())->eq(0);
 
@@ -659,7 +602,16 @@ Hack;
     <<Test>>
     public function argumentsWithInvalidDefaults(Assert $assert) : void
     {
-        $parser = $this->parse(self::$argumentsWithInvalidDefaults);
+        $code = <<<'Hack'
+<?hh
+<<Command('complex'), Arguments('one=default', 'two', 'three=three')>>
+function complexhandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
@@ -667,7 +619,16 @@ Hack;
     <<Test>>
     public function wrongArgumentNameType(Assert $assert) : void
     {
-        $parser = $this->parse(self::$wrongArgumentNameType);
+        $code = <<<'Hack'
+<?hh
+<<Command('complex'), Arguments(1, 'two')>>
+function complexhandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
         $assert->int($parser->commands()->count())->eq(0);
         $assert->int($parser->failures()->count())->eq(1);
     }
