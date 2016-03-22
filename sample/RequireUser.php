@@ -8,9 +8,9 @@ use HackPack\HackMini\Message\Request;
 use HackPack\HackMini\Message\Response;
 use HackPack\HackMini\Middleware\Next;
 
-final class RequireUser implements Middleware<Request, Response>
+final class RequireUser implements Middleware<Request, Response, Response>
 {
-    <<Provides('RequireUser')>>
+    <<ProvideMiddleware('RequireUser')>>
     public static function factory(FactoryContainer $c) : this
     {
         return new static($c->getAuth());
@@ -23,7 +23,7 @@ final class RequireUser implements Middleware<Request, Response>
     public function handle(
         Request $req,
         Response $rsp,
-        Next<Request, Response> $next
+        Next<Request, Response, Response> $next
     ) : Response
     {
         $me = $this->auth->extractUserFromRequest($req);

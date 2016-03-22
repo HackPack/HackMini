@@ -24,4 +24,17 @@ class UserInteraction
     {
         $this->writer->write($message . PHP_EOL);
     }
+
+    public function prompt(string $prompt = '') : string
+    {
+        $this->writer->write($prompt);
+        return $this->reader->readline();
+    }
+
+    public function showList(Traversable<string> $list) : void
+    {
+        foreach($list as $line) {
+            $this->showLine($line);
+        }
+    }
 }

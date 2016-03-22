@@ -62,10 +62,12 @@ final class DefinitionParser
 
             try {
 
-                $commandName = $this->checkCommandName($function->getAttributes()->get('Command'));
+                $attributes = $function->getAttributes();
+                $commandName = $this->checkCommandName($attributes->get('Command'));
                 if($commandName === null) {
                     return;
                 }
+                $middleware = $this->checkMiddleware($attributes->get('UseMiddleware'));
 
                 $this->checkParameters($function->getParameters());
                 $this->checkReturnType($function->getReturnType());
@@ -83,6 +85,7 @@ final class DefinitionParser
                         $commandName,
                         $function->getAttributes()->get('Arguments')
                     ),
+                    'middleware' => $middleware,
                 ));
 
             } catch (\UnexpectedValueException $e) {
@@ -102,7 +105,8 @@ final class DefinitionParser
     private function parseMethod(ScannedBasicClass $class, ScannedMethod $method) : void
     {
         try {
-            $commandName = $this->checkCommandName($method->getAttributes()->get('Command'));
+            $attributes = $method->getAttributes();
+            $commandName = $this->checkCommandName($attributes->get('Command'));
             if($commandName === null) {
                 return;
             }
@@ -111,6 +115,7 @@ final class DefinitionParser
                 throw new \UnexpectedValueException('Command methods must be static.');
             }
 
+            $middleware = $this->checkMiddleware($attributes->get('UseMiddleware'));
             $this->checkParameters($method->getParameters());
             $this->checkReturnType($method->getReturnType());
 
@@ -128,6 +133,7 @@ final class DefinitionParser
                     $commandName,
                     $method->getAttributes()->get('Arguments')
                 ),
+                'middleware' => $middleware,
             ));
 
         } catch (\UnexpectedValueException $e) {
@@ -369,5 +375,23 @@ final class DefinitionParser
         if($add) {
             $this->names->add($name);
         }
+    }
+
+    private function checkMiddleware(?Vector<mixed> $stack) : Vector<string>
+    {
+        if($stack === null) {
+            return Vector{};
+        }
+
+        $out = Vector{};
+        foreach($stack as $value) {
+            if(!is_string($value)) {
+                throw new \UnexpectedValueException(
+                    'Middleware names must be strings',
+                );
+            }
+            $out->add($value);
+        }
+        return $out;
     }
 }

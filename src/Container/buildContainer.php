@@ -18,7 +18,7 @@ function buildContainerCommand(
         $req->get('include-path'),
         $req->get('exclude-path'),
     );
-    return buildContainer($fileList,  $req->projectRoot() . '/FactoryContainer.php');
+    return buildContainer($fileList,  $req->projectRoot() . '/build/FactoryContainer.php');
 }
 
 function buildContainer(Vector<\SplFileInfo> $fileList, string $outfile) : int

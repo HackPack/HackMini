@@ -12,6 +12,7 @@ class Handler
 
     public function handle(\Exception $e) : int
     {
+        $this->interaction->showLine('Uncaught exception.');
         $this->interaction->show($e->getMessage());
         return 1;
     }

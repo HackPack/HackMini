@@ -26,6 +26,9 @@ function commands() : Map<string, Definition>
                 ),
             },
             'handler' => fun('HackPack\HackMini\Sample\createUserFromCli'),
+            'middleware' => Vector{
+                class_meth('HackPack\HackMini\Sample\ShowColors', 'factory'),
+            },
         ),
         'commands:build' => shape(
             'arguments' => Vector{},
@@ -42,6 +45,7 @@ function commands() : Map<string, Definition>
                 ),
             },
             'handler' => fun('HackPack\HackMini\Command\buildCommandsCommand'),
+            'middleware' => Vector{},
         ),
         'container:build' => shape(
             'arguments' => Vector{},
@@ -58,6 +62,7 @@ function commands() : Map<string, Definition>
                 ),
             },
             'handler' => fun('HackPack\HackMini\Container\buildContainerCommand'),
+            'middleware' => Vector{},
         ),
         'routes:build' => shape(
             'arguments' => Vector{},
@@ -74,11 +79,13 @@ function commands() : Map<string, Definition>
                 ),
             },
             'handler' => fun('HackPack\HackMini\Router\buildRoutes'),
+            'middleware' => Vector{},
         ),
         'some-command' => shape(
             'arguments' => Vector{},
             'options' => Vector{},
             'handler' => class_meth(HackPack\HackMini\Sample\HandlerClass::class, 'someCommand'),
+            'middleware' => Vector{},
         ),
     };
 }

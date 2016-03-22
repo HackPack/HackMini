@@ -633,6 +633,28 @@ Hack;
         $assert->int($parser->failures()->count())->eq(1);
     }
 
+    <<Test>>
+    private function parseMiddlewareStack(Assert $assert) : void
+    {
+        $code = <<<'Hack'
+<?hh
+<<Command('name'), UseMiddleware('one', 'two')>>
+function someHandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+        $parser = $this->parse($code);
+        $assert->int($parser->failures()->count())->eq(0);
+        $assert->int($parser->commands()->count())->eq(1);
+
+        $middleware = $parser->commands()->at(0)['middleware'];
+
+        $assert->int($middleware->count())->eq(2);
+        $assert->string($middleware->at(0))->is('one');
+        $assert->string($middleware->at(1))->is('two');
+    }
     private function parse(string $code) : DefinitionParser
     {
         $fileParser = FileParser::FromData($code);

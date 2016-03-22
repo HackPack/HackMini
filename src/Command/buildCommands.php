@@ -4,6 +4,7 @@ namespace HackPack\HackMini\Command;
 
 use HackPack\HackMini\Command\Request;
 use HackPack\HackMini\Command\UserInteraction;
+use HackPack\HackMini\Middleware\DefinitionParser as MiddlewareParser;
 
 use HackPack\HackMini\Util;
 
@@ -18,17 +19,30 @@ function buildCommandsCommand(
         $req->get('include-path'),
         $req->get('exclude-path'),
     );
-    return buildCommands($fileList,  $req->projectRoot() . '/commands.php');
+    $rsp->showLine('Building commands');
+    return buildCommands($fileList,  $req->projectRoot() . '/build/commands.php');
 }
 
 function buildCommands(Vector<\SplFileInfo> $fileList, string $outfile) : int
 {
-    $parser = DefinitionParser::fromFileList($fileList);
-    if($parser->failures()) {
-        var_dump($parser->failures());
+    // TODO: optimize this.  Both are parsing the same files.
+    $middlewareParser = MiddlewareParser::fromFileList($fileList);
+    if($middlewareParser->failures()) {
+        var_dump($middlewareParser->failures());
         return 1;
     }
-    $builder = new Builder($parser->commands());
+
+    $commandParser = DefinitionParser::fromFileList($fileList);
+    if($commandParser->failures()) {
+        var_dump($commandParser->failures());
+        return 1;
+    }
+
+    $builder = new Builder(
+        $commandParser->commands(),
+        $middlewareParser->middleware(),
+    );
+
     $fp = fopen($outfile, 'w');
     fwrite($fp, $builder->render());
     fclose($fp);

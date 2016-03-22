@@ -2,7 +2,11 @@
     "roots": [
         "src/",
         "build/",
-        "test/"
+        "test/",
+        "sample/"
+    ],
+    "extraFiles": [
+        "middleware.php"
     ],
     "includeVendor": true
 }

@@ -25,4 +25,5 @@ $request = HackPack\HackMini\Command\Request::fromEnv($argv, $path);
 $io = new HackPack\HackMini\Command\StdIO();
 $interaction = new HackPack\HackMini\Command\UserInteraction($io, $io);
 $app = new HackPack\HackMini\CliApp($request, $interaction);
-exit($app->run());
+$result = $app->run();
+exit($result);

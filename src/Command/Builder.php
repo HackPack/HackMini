@@ -26,6 +26,7 @@ Hack;
 
     public function __construct(
         private \ConstVector<ParsedDefinition> $definitions,
+        private \ConstMap<string,string> $middleware,
     ) { }
 
     public function render() : string
@@ -46,11 +47,14 @@ Hack;
 
         $handler = $this->renderHandler($definition);
 
+        $middleware = $this->renderMiddleware($definition['middleware']);
+
         return <<<Hack
         '{$name}' => shape(
             'arguments' => {$arguments},
             'options' => {$options},
             'handler' => {$handler},
+            'middleware' => {$middleware},
         ),
 Hack;
     }
@@ -162,5 +166,29 @@ Hack;
     private function renderMethodCommand(string $class, string $method) : string
     {
         return "class_meth({$class}::class, '{$method}')";
+    }
+
+    private function renderMiddleware(\ConstVector<string> $list) : string
+    {
+        if($list->isEmpty()) {
+            return 'Vector{}';
+        }
+
+        $list = $list->map($item ==> {
+            $code = $this->middleware->get($item);
+            if($code === null) {
+                throw new \UnexpectedValueException(
+                    'Unknown middleware ' . $item,
+                );
+            }
+            return $code;
+        });
+
+        return implode(
+            PHP_EOL . '            ',
+            (Vector{'Vector{'})
+            ->addAll($list->map($item ==> '    ' . $item . ','))
+            ->add('}'),
+        );
     }
 }

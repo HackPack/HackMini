@@ -9,5 +9,6 @@ type ParsedDefinition = shape(
     'method' => ?string,
     'arguments' => \ConstVector<ArgumentDefinition>,
     'options' => \ConstVector<OptionDefinition>,
+    'middleware' => \ConstVector<string>,
 );
 

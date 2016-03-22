@@ -2,7 +2,4 @@
 
 namespace HackPack\HackMini\Middleware;
 
-use Psr\Http\Message\RequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
-
-type Next<Trequest, Tresponse> = (function(Trequest,Tresponse):Tresponse);
+type Next<Trequest, Tresponse, Tresult> = (function(Trequest,Tresponse):Tresult);

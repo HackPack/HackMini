@@ -59,18 +59,6 @@ final class FactoryContainer
 
 
     <<__Memoize>>
-    public function getRequireUser() : HackPack\HackMini\Sample\RequireUser
-    {
-        return $this->newRequireUser();
-    }
-
-    public function newRequireUser() : HackPack\HackMini\Sample\RequireUser
-    {
-        return $this->__build__('RequireUser', class_meth('HackPack\HackMini\Sample\RequireUser', 'factory'));
-    }
-
-
-    <<__Memoize>>
     public function getUserDetailPage() : UserDetailPage
     {
         return $this->newUserDetailPage();
