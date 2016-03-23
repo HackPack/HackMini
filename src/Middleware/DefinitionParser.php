@@ -56,7 +56,7 @@ final class DefinitionParser
 
     private function parseFunctions(\ConstVector<ScannedFunction> $functions) : void
     {
-        array_walk($functions->toArray(), $function ==> {
+        $functions->map($function ==> {
 
             try {
 
@@ -66,21 +66,23 @@ final class DefinitionParser
                     return;
                 }
 
-                $function = $function->getName();
-                $this->middleware->set($name, "fun('{$function}')");
+                $this->checkParameters($function->getParameters());
+
+                $functionName = $function->getName();
+                $this->middleware->set($name, "fun('{$functionName}')");
 
             } catch (\UnexpectedValueException $e) {
 
                 $pos = $function->getPosition();
                 $this->failures->add(shape(
-                    'file' => $pos['filename'],
-                    'function' => $function->getName(),
-                    'line' => Shapes::idx($pos, 'line', null),
-                    'reason' => $e->getMessage(),
-                ));
+                'file' => $pos['filename'],
+                'function' => $function->getName(),
+                'line' => Shapes::idx($pos, 'line', null),
+                'reason' => $e->getMessage(),
+            ));
 
-            }
-        });
+        }
+    });
     }
 
     private function parseMethod(ScannedBasicClass $class, ScannedMethod $method) : void
@@ -128,6 +130,12 @@ final class DefinitionParser
     {
         if($name === null) {
             return null;
+        }
+
+        if($name->isEmpty()) {
+            throw new \UnexpectedValueException(
+                'You must name your middleware: <<ProvideMiddleware(\'name\')>>',
+            );
         }
 
         $name = $name->at(0);
