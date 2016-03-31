@@ -11,6 +11,30 @@ final class FactoryContainer
 {
 
     <<__Memoize>>
+    public function getServerRequest() : \HackPack\HackMini\Message\Request
+    {
+        return $this->newServerRequest();
+    }
+
+    public function newServerRequest() : \HackPack\HackMini\Message\Request
+    {
+        return $this->__build__('ServerRequest', fun('HackPack\HackMini\Message\buildRequestFromGlobals'));
+    }
+
+
+    <<__Memoize>>
+    public function getServerBody() : \HackPack\HackMini\Message\StreamBody
+    {
+        return $this->newServerBody();
+    }
+
+    public function newServerBody() : \HackPack\HackMini\Message\StreamBody
+    {
+        return $this->__build__('ServerBody', fun('HackPack\HackMini\Message\buildServerBodyFromGlobals'));
+    }
+
+
+    <<__Memoize>>
     public function getAuth() : HackPack\HackMini\Sample\Auth
     {
         return $this->newAuth();
@@ -91,6 +115,42 @@ final class FactoryContainer
     public function newMockUserStore() : HackPack\HackMini\Sample\UserStore
     {
         return $this->__build__('MockUserStore', class_meth('HackPack\HackMini\Sample\UserStore', 'mocked'));
+    }
+
+
+    <<__Memoize>>
+    public function getServerResponse() : HackPack\HackMini\Message\Response
+    {
+        return $this->newServerResponse();
+    }
+
+    public function newServerResponse() : HackPack\HackMini\Message\Response
+    {
+        return $this->__build__('ServerResponse', class_meth('HackPack\HackMini\Message\Response', 'factory'));
+    }
+
+
+    <<__Memoize>>
+    public function getWebRouter() : HackPack\HackMini\Router\Web
+    {
+        return $this->newWebRouter();
+    }
+
+    public function newWebRouter() : HackPack\HackMini\Router\Web
+    {
+        return $this->__build__('WebRouter', class_meth('HackPack\HackMini\Router\Web', 'factory'));
+    }
+
+
+    <<__Memoize>>
+    public function getWebApp() : HackPack\HackMini\WebApp
+    {
+        return $this->newWebApp();
+    }
+
+    public function newWebApp() : HackPack\HackMini\WebApp
+    {
+        return $this->__build__('WebApp', class_meth('HackPack\HackMini\WebApp', 'factory'));
     }
 
     private Set<string> $names = Set{};

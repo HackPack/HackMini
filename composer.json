@@ -26,5 +26,9 @@
     "require-dev": {
         "hackpack/hackunit": "^0.5.0",
         "facebook/xhp-lib": "^2.2"
+    },
+    "scripts": {
+      "test": "vendor/bin/hackunit test",
+      "serve": "hhvm -m server -c dev.ini -d hhvm.server.source_root=$(pwd)/public &"
     }
 }
