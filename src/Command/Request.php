@@ -73,6 +73,11 @@ class Request
         return $values->at($values->count() - 1);
     }
 
+    public function has(string $name) : bool
+    {
+      return $this->input->containsKey($name);
+    }
+
     public function unnamedArguments() : \ConstVector<string>
     {
         return $this->unnamedArguments;

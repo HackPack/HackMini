@@ -17,7 +17,7 @@ while($path !== '/') {
 }
 
 if($path === '/') {
-    echo 'Unable to locate the Composer autoload file.  Please see the documentation for installing HackMini.';
+    echo 'Unable to locate hh_autoload.php.  Please see the documentation for installing HackMini.';
     exit(1);
 }
 

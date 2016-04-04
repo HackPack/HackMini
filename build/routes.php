@@ -1,6 +1,6 @@
 <?hh // strict
 
-use HackPack\HackMini\Contract\Middleware;
+use HackPack\HackMini\Contract\MiddlewareFactory;
 use HackPack\HackMini\Message\Request;
 use HackPack\HackMini\Message\Response;
 use HackPack\HackMini\Message\RestMethod;

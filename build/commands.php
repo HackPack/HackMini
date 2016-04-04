@@ -30,6 +30,27 @@ function commands() : Map<string, Definition>
                 class_meth('HackPack\HackMini\Sample\ShowColors', 'factory'),
             },
         ),
+        'commands:generate' => shape(
+            'arguments' => Vector{
+                shape(
+                    'name' => 'name',
+                ),
+            },
+            'options' => Vector{
+                shape(
+                    'name' => 'path',
+                    'alias' => 'p',
+                    'value required' => true,
+                ),
+                shape(
+                    'name' => 'class',
+                    'alias' => 'c',
+                    'value required' => false,
+                ),
+            },
+            'handler' => fun('HackPack\HackMini\CodeGenerator\generateCommandHandler'),
+            'middleware' => Vector{},
+        ),
         'commands:build' => shape(
             'arguments' => Vector{},
             'options' => Vector{
