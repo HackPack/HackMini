@@ -78,7 +78,7 @@ function commands() : Map<string, Definition>
                     'value required' => true,
                 ),
             },
-            'handler' => fun('HackPack\HackMini\Router\buildRoutes'),
+            'handler' => fun('HackPack\HackMini\Routes\buildRoutes'),
             'middleware' => Vector{},
         ),
         'some-command' => shape(

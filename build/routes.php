@@ -11,7 +11,7 @@ function routes(
 Map<string,
 shape(
   'handler' => Handler,
-  'middleware' => Vector<Middleware<Request, Response, Response>>,
+  'middleware' => Vector<MiddlewareFactory<Request, Response, Response>>,
 )>> {
   return Map {
     RestMethod::Post => Map {
@@ -23,11 +23,15 @@ shape(
     RestMethod::Get => Map {
       '/user/(\d+)' => shape(
         'handler' => fun('HackPack\HackMini\Sample\showUser'),
-        'middleware' => Vector {},
+        'middleware' => Vector {
+          class_meth('HackPack\HackMini\Sample\RequireUser', 'factory'),
+        },
       ),
       '/me' => shape(
         'handler' => fun('HackPack\HackMini\Sample\showMyProfile'),
-        'middleware' => Vector {},
+        'middleware' => Vector {
+          class_meth('HackPack\HackMini\Sample\RequireUser', 'factory'),
+        },
       ),
     },
   };
