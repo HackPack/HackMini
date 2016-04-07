@@ -3,3 +3,4 @@ vendor/
 composer.lock
 **/www.pid
 .DS_Store
+ssl/
