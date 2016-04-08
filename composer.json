@@ -4,6 +4,7 @@
     "type": "project",
     "keywords": ["framework", "microframework", "micro", "psr7", "router", "middleware"],
     "require": {
+        "hhvm": ">=3.11",
         "psr/http-message": "^1.0",
         "fredemmott/definition-finder": "^1.1",
         "hack-psr/psr7-http-message-hhi": "^0.2.0",
@@ -29,6 +30,5 @@
     },
     "scripts": {
       "test": "vendor/bin/hackunit test",
-      "serve": "hhvm -m server -c dev.ini -d hhvm.server.source_root=$(pwd)/public &"
     }
 }
