@@ -6,12 +6,10 @@ use FredEmmott\DefinitionFinder\FileParser;
 use HackPack\HackMini\Middleware\DefinitionParser;
 use HackPack\HackUnit\Contract\Assert;
 
-class DefinitionParserTest
-{
-    <<Test>>
-    public function parseCorrect(Assert $assert) : void
-    {
-        $code = <<<'Hack'
+class DefinitionParserTest {
+  <<Test>>
+  public function parseCorrect(Assert $assert): void {
+    $code = <<<'Hack'
 <?hh
 class MiddlewareProvider
 {
@@ -23,28 +21,24 @@ class MiddlewareProvider
 function factory(FactoryContainer $c) : void { }
 Hack;
 
-        $parser = $this->parse($code);
+    $parser = $this->parse($code);
 
-        $assert->int($parser->failures()->count())->eq(0);
+    $assert->int($parser->failures()->count())->eq(0);
 
-        $middleware = $parser->middleware();
-        $assert->int($middleware->count())->eq(2);
+    $middleware = $parser->middleware();
+    $assert->int($middleware->count())->eq(2);
 
-        $assert->bool($middleware->containsKey('class'))->is(true);
-        $assert->string($middleware->at('class'))->is(
-            'class_meth(\'MiddlewareProvider\', \'factory\')'
-        );
+    $assert->bool($middleware->containsKey('class'))->is(true);
+    $assert->string($middleware->at('class'))
+      ->is('class_meth(\'MiddlewareProvider\', \'factory\')');
 
-        $assert->bool($middleware->containsKey('function'))->is(true);
-        $assert->string($middleware->at('function'))->is(
-            'fun(\'factory\')'
-        );
-    }
+    $assert->bool($middleware->containsKey('function'))->is(true);
+    $assert->string($middleware->at('function'))->is('fun(\'factory\')');
+  }
 
-    <<Test>>
-    public function badNameType(Assert $assert) : void
-    {
-        $code = <<<'Hack'
+  <<Test>>
+  public function badNameType(Assert $assert): void {
+    $code = <<<'Hack'
 <?hh
 class MiddlewareProvider
 {
@@ -56,15 +50,14 @@ class MiddlewareProvider
 function factory(FactoryContainer $c) : void { }
 Hack;
 
-        $parser = $this->parse($code);
-        $assert->int($parser->failures()->count())->eq(2);
-        $assert->int($parser->middleware()->count())->eq(0);
-    }
+    $parser = $this->parse($code);
+    $assert->int($parser->failures()->count())->eq(2);
+    $assert->int($parser->middleware()->count())->eq(0);
+  }
 
-    <<Test>>
-    public function nonStaticMethod(Assert $assert) : void
-    {
-        $code = <<<'Hack'
+  <<Test>>
+  public function nonStaticMethod(Assert $assert): void {
+    $code = <<<'Hack'
 <?hh
 class MiddlewareProvider
 {
@@ -73,15 +66,14 @@ class MiddlewareProvider
 }
 Hack;
 
-        $parser = $this->parse($code);
-        $assert->int($parser->failures()->count())->eq(1);
-        $assert->int($parser->middleware()->count())->eq(0);
-    }
+    $parser = $this->parse($code);
+    $assert->int($parser->failures()->count())->eq(1);
+    $assert->int($parser->middleware()->count())->eq(0);
+  }
 
-    <<Test>>
-    public function tooFewParams(Assert $assert) : void
-    {
-        $code = <<<'Hack'
+  <<Test>>
+  public function tooFewParams(Assert $assert): void {
+    $code = <<<'Hack'
 <?hh
 class MiddlewareProvider
 {
@@ -93,15 +85,14 @@ class MiddlewareProvider
 function factory() : void { }
 Hack;
 
-        $parser = $this->parse($code);
-        $assert->int($parser->failures()->count())->eq(2);
-        $assert->int($parser->middleware()->count())->eq(0);
-    }
+    $parser = $this->parse($code);
+    $assert->int($parser->failures()->count())->eq(2);
+    $assert->int($parser->middleware()->count())->eq(0);
+  }
 
-    <<Test>>
-    public function tooManyParams(Assert $assert) : void
-    {
-        $code = <<<'Hack'
+  <<Test>>
+  public function tooManyParams(Assert $assert): void {
+    $code = <<<'Hack'
 <?hh
 class MiddlewareProvider
 {
@@ -113,15 +104,14 @@ class MiddlewareProvider
 function factory(FactoryContainer $c, int $other) : void { }
 Hack;
 
-        $parser = $this->parse($code);
-        $assert->int($parser->failures()->count())->eq(2);
-        $assert->int($parser->middleware()->count())->eq(0);
-    }
+    $parser = $this->parse($code);
+    $assert->int($parser->failures()->count())->eq(2);
+    $assert->int($parser->middleware()->count())->eq(0);
+  }
 
-    <<Test>>
-    public function enoughRequiredParams(Assert $assert) : void
-    {
-        $code = <<<'Hack'
+  <<Test>>
+  public function enoughRequiredParams(Assert $assert): void {
+    $code = <<<'Hack'
 <?hh
 class MiddlewareProvider
 {
@@ -134,15 +124,14 @@ class MiddlewareProvider
 function factory(FactoryContainer $c, ?string $other = null) : void { }
 Hack;
 
-        $parser = $this->parse($code);
-        $assert->int($parser->failures()->count())->eq(0);
-        $assert->int($parser->middleware()->count())->eq(2);
-    }
+    $parser = $this->parse($code);
+    $assert->int($parser->failures()->count())->eq(0);
+    $assert->int($parser->middleware()->count())->eq(2);
+  }
 
-    <<Test>>
-    public function repeatedMiddlewareName(Assert $assert) : void
-    {
-        $code = <<<'Hack'
+  <<Test>>
+  public function repeatedMiddlewareName(Assert $assert): void {
+    $code = <<<'Hack'
 <?hh
 class MiddlewareProvider
 {
@@ -155,17 +144,16 @@ class MiddlewareProvider
 function factory(FactoryContainer $c, int $other = 0) : void { }
 Hack;
 
-        $parser = $this->parse($code);
-        $assert->int($parser->failures()->count())->eq(1);
-        $assert->int($parser->middleware()->count())->eq(1);
-    }
+    $parser = $this->parse($code);
+    $assert->int($parser->failures()->count())->eq(1);
+    $assert->int($parser->middleware()->count())->eq(1);
+  }
 
-    private function parse(string $code) : DefinitionParser
-    {
-        $fileParser = FileParser::FromData($code);
-        $functions = $fileParser->getFunctions();
-        $classes = $fileParser->getClasses();
-        return new DefinitionParser($functions, $classes);
-    }
+  private function parse(string $code): DefinitionParser {
+    $fileParser = FileParser::FromData($code);
+    $functions = $fileParser->getFunctions();
+    $classes = $fileParser->getClasses();
+    return new DefinitionParser($functions, $classes);
+  }
 
 }

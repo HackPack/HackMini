@@ -1,12 +1,12 @@
 {
-    "roots": [
-        "src/",
-        "build/",
-        "test/",
-        "sample/"
-    ],
-    "extraFiles": [
-        "middleware.php"
-    ],
-    "includeVendor": true
+  "roots": [
+    "src/",
+    "build/",
+    "test/",
+    "sample/"
+  ],
+  "extraFiles": [
+    "middleware.php"
+  ],
+  "includeVendor": true
 }

@@ -33,12 +33,12 @@ class StringReader implements Reader {
     $this->position = 0;
   }
 
-  public function append(string $data) : void {
+  public function append(string $data): void {
     $this->data .= $data;
   }
 
-  public function addLine(string $line) : void {
-    $this->append($line . PHP_EOL);
+  public function addLine(string $line): void {
+    $this->append($line.PHP_EOL);
   }
 
   /**

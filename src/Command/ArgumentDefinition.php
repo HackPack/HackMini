@@ -3,6 +3,6 @@
 namespace HackPack\HackMini\Command;
 
 type ArgumentDefinition = shape(
-    'name' => string,
-    'default' => ?string,
+  'name' => string,
+  'default' => ?string,
 );

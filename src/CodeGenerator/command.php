@@ -56,7 +56,6 @@ function generateCommandHandler(
     $name = ucfirst($name);
   }
 
-
   $filename = Util\implodePath(Vector {$path, $name.'.php'});
   $interaction->showLine('Writing new command handler to '.$filename);
   file_put_contents($filename, $code);

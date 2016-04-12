@@ -2,4 +2,4 @@
 
 namespace HackPack\HackMini\Command;
 
-type Handler = (function(\FactoryContainer,Request,UserInteraction):int);
+type Handler = (function(\FactoryContainer, Request, UserInteraction): int);

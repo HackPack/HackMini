@@ -38,22 +38,22 @@ class UserInteractionTest {
   }
 
   <<Test>>
-  public function wrongSelection(Assert $assert) : void {
+  public function wrongSelection(Assert $assert): void {
     $interaction = $this->buildInteraction();
     $this->reader->addLine('wrong');
     $this->reader->addLine('wrong');
 
-    $answer = $interaction->select('Q', Set{'right', 'not wrong'}, 2);
+    $answer = $interaction->select('Q', Set {'right', 'not wrong'}, 2);
     $assert->mixed($answer)->isNull();
   }
 
   <<Test>>
-  public function rightSelection(Assert $assert) : void {
+  public function rightSelection(Assert $assert): void {
     $interaction = $this->buildInteraction();
     $this->reader->addLine('wrong');
     $this->reader->addLine('right');
 
-    $answer = $interaction->select('Q', Set{'right', 'not wrong'}, 2);
+    $answer = $interaction->select('Q', Set {'right', 'not wrong'}, 2);
     $assert->mixed($answer)->identicalTo('right');
   }
 }

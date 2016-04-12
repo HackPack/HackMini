@@ -2,4 +2,4 @@
 
 namespace HackPack\HackMini\Middleware;
 
-type Next<Trequest, Tresponse, Tresult> = (function(Trequest,Tresponse):Tresult);
+type Next<Trequest, Tresponse, Tresult> = (function(Trequest, Tresponse): Tresult);

@@ -9,7 +9,7 @@ use HackPack\HackMini\Contract\Command\Writer;
 class UserInteraction {
   public function __construct(private Reader $reader, private Writer $writer) {}
 
-  public function show(string $message ): void {
+  public function show(string $message): void {
     $this->writer->write($message);
   }
 
@@ -34,11 +34,13 @@ class UserInteraction {
     \ConstSet<string> $answers,
     int $maxAttempts = -1,
   ): ?string {
-    if($answers->isEmpty()) {
-    throw new \UnexpectedValueException('You must supply at least one selection.');
+    if ($answers->isEmpty()) {
+      throw new \UnexpectedValueException(
+        'You must supply at least one selection.',
+      );
     }
     $answerList = '['.implode(', ', $answers).']';
-    $question = $question . ' ' . $answerList . PHP_EOL . '>';
+    $question = $question.' '.$answerList.PHP_EOL.'>';
 
     $attempts = 0;
     while ($maxAttempts < 0 || $attempts < $maxAttempts) {
@@ -52,17 +54,15 @@ class UserInteraction {
       $this->showLine('Please select from the list shown.');
 
       if ($maxAttempts > -1 && $attempts < $maxAttempts) {
-        $this->show(sprintf(
-          'You have %d attempt(s) left.',
-          $maxAttempts - $attempts,
-        ));
+        $this->show(
+          sprintf('You have %d attempt(s) left.', $maxAttempts - $attempts),
+        );
       }
     }
     return null;
   }
 
-  public function ask(string $question):string
-  {
+  public function ask(string $question): string {
     $this->show($question);
     return $this->reader->readline();
   }

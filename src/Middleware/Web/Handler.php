@@ -6,4 +6,4 @@ use FactoryContainer;
 use HackPack\HackMini\Message\Request;
 use HackPack\HackMini\Message\Response;
 
-type Handler = (function(FactoryContainer, Request, Response) : Response);
+type Handler = (function(FactoryContainer, Request, Response): Response);

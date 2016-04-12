@@ -221,8 +221,7 @@ Hack;
   }
 
   <<Test>>
-  public function namespaced(Assert $assert) : void
-  {
+  public function namespaced(Assert $assert): void {
     $code = <<<'Hack'
 <?hh
 namespace Some\NS;

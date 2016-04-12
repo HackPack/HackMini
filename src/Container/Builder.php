@@ -2,9 +2,8 @@
 
 namespace HackPack\HackMini\Container;
 
-final class Builder
-{
-    const string HEAD = <<<'Hack'
+final class Builder {
+  const string HEAD = <<<'Hack'
 <?hh // strict
 
 /**
@@ -18,7 +17,8 @@ final class FactoryContainer
 {
 Hack;
 
-    const string FOOT = <<<'Hack'
+  const string
+    FOOT = <<<'Hack'
     private Set<string> $names = Set{};
 
     private function __build__<T>(string $name, (function(this):T) $factory) : T
@@ -34,28 +34,26 @@ Hack;
 }
 Hack;
 
-    public function __construct(
-        private \ConstVector<ParsedDefinition> $definitions,
-    ) { }
+  public function __construct(
+    private \ConstVector<ParsedDefinition> $definitions,
+  ) {}
 
-    public function render() : string
-    {
-        return implode(
-            PHP_EOL,
-            (Vector{self::HEAD})
-            ->addAll($this->definitions->map($d ==> $this->renderDefinition($d)))
-            ->add(self::FOOT)
-        );
-    }
+  public function render(): string {
+    return implode(
+      PHP_EOL,
+      (Vector {self::HEAD})->addAll(
+        $this->definitions->map($d ==> $this->renderDefinition($d)),
+      )->add(self::FOOT),
+    );
+  }
 
-    private function renderDefinition(ParsedDefinition $definition) : string
-    {
-        $name = ucfirst($definition['name']);
-        $return = $definition['return'];
+  private function renderDefinition(ParsedDefinition $definition): string {
+    $name = ucfirst($definition['name']);
+    $return = $definition['return'];
 
-        $handler = $this->renderFactory($definition);
+    $handler = $this->renderFactory($definition);
 
-        return <<<Hack
+    return<<<Hack
 
     <<__Memoize>>
     public function get{$name}() : {$return}
@@ -69,26 +67,27 @@ Hack;
     }
 
 Hack;
+  }
+
+  private function renderFactory(ParsedDefinition $definition): string {
+    $function = Shapes::idx($definition, 'function');
+    if (is_string($function)) {
+      return "fun('{$function}')";
     }
 
-    private function renderFactory(ParsedDefinition $definition) : string
-    {
-        $function = Shapes::idx($definition, 'function');
-        if(is_string($function)) {
-            return "fun('{$function}')";
-        }
+    $class = Shapes::idx($definition, 'class');
+    $method = Shapes::idx($definition, 'method');
 
-        $class = Shapes::idx($definition, 'class');
-        $method = Shapes::idx($definition, 'method');
-
-        if($class === null || $method === null) {
-            throw new \UnexpectedValueException(sprintf(
-                'Service %s does not have a defined factory.',
-                $definition['name'],
-            ));
-        }
-
-        return "class_meth('{$class}', '{$method}')";
+    if ($class === null || $method === null) {
+      throw new \UnexpectedValueException(
+        sprintf(
+          'Service %s does not have a defined factory.',
+          $definition['name'],
+        ),
+      );
     }
+
+    return "class_meth('{$class}', '{$method}')";
+  }
 
 }

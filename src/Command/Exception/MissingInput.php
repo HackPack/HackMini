@@ -4,20 +4,19 @@ namespace HackPack\HackMini\Command\Exception;
 
 use HackPack\HackMini\Command\Request;
 
-class MissingInput extends \Exception
-{
-    public function __construct(private Request $request, private string $inputName)
-    {
-        parent::__construct();
-    }
+class MissingInput extends \Exception {
+  public function __construct(
+    private Request $request,
+    private string $inputName,
+  ) {
+    parent::__construct();
+  }
 
-    public function request() : Request
-    {
-        return $this->request;
-    }
+  public function request(): Request {
+    return $this->request;
+  }
 
-    public function inputName() : string
-    {
-        return $this->inputName;
-    }
+  public function inputName(): string {
+    return $this->inputName;
+  }
 }

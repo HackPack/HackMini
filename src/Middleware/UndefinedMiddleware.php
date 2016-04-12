@@ -2,4 +2,4 @@
 
 namespace HackPack\HackMini\Middleware;
 
-class UndefinedMiddleware extends \Exception { }
+class UndefinedMiddleware extends \Exception {}
