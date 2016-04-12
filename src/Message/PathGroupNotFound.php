@@ -2,4 +2,4 @@
 
 namespace HackPack\HackMini\Message;
 
-class PathGroupNotFound extends \Exception { }
+class PathGroupNotFound extends \Exception {}

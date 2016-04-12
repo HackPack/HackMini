@@ -136,7 +136,7 @@ class StreamBody implements StreamInterface {
    * @throws \RuntimeException on failure.
    */
   public function seek(?int $offset, ?int $whence = SEEK_SET): void {
-    if($offset === null) {
+    if ($offset === null) {
       throw new \RuntimeException('Null offset');
     }
 
@@ -185,10 +185,10 @@ class StreamBody implements StreamInterface {
    * @throws \RuntimeException on failure.
    */
   public function write(?string $string): int {
-    if($string === null) {
+    if ($string === null) {
       $string = '';
     }
-    
+
     if (!is_resource($this->stream)) {
       throw new \RuntimeException('Attempted to write to a detached stream.');
     }
@@ -228,7 +228,7 @@ class StreamBody implements StreamInterface {
    * @throws \RuntimeException if an error occurs.
    */
   public function read(?int $length): string {
-    if($length === null) {
+    if ($length === null) {
       return '';
     }
 

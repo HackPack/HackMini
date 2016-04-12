@@ -105,10 +105,10 @@ final class Request implements RequestInterface {
     $new = clone $this;
     $new->uri = Uri::fromPsr($uri);
 
-    if($preserveHost === null) {
+    if ($preserveHost === null) {
       $preserveHost = false;
     }
-    
+
     $currentHeader = $new->getHeaderLine('Host');
     if (// Don't touch the host header
         $preserveHost &&

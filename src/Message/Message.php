@@ -188,7 +188,7 @@ trait Message {
     if ($name === null) {
       throw new \InvalidArgumentException('Header names may not be null.');
     }
-    
+
     $lowerName = strtolower($name);
     $new = clone $this;
 

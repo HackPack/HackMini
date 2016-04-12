@@ -120,8 +120,8 @@ final class Uri implements UriInterface {
 
   public function withUserInfo(?string $user, ?string $password = null): this {
     $new = clone $this;
-    $new->user = (string)$user;
-    $new->password = (string)$password;
+    $new->user = (string) $user;
+    $new->password = (string) $password;
     return $new;
   }
 
@@ -166,7 +166,7 @@ final class Uri implements UriInterface {
   private function encodePath(?string $path): string {
     // TODO: ensure the path is correctly encoded
     // TODO: throw \InvalidArgumentException when $path is invalid
-    return (string)$path;
+    return (string) $path;
   }
 
   public function withQuery(?string $query): this {
@@ -178,7 +178,7 @@ final class Uri implements UriInterface {
   private function encodeQuery(?string $query): string {
     // TODO: properly encode the query string
     // TODO: throw \InvalidArgumentException for invalid query strings
-    return (string)$query;
+    return (string) $query;
   }
 
   public function withFragment(?string $fragment): this {
@@ -189,7 +189,7 @@ final class Uri implements UriInterface {
 
   private function encodeFragment(?string $fragment): string {
     // TODO: properly encode fragment
-    return (string)$fragment;
+    return (string) $fragment;
   }
 
   public function getQueryWithQuestion(): string {

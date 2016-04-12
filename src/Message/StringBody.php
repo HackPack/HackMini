@@ -158,7 +158,7 @@ class StringBody implements StreamInterface {
    */
   public function write(?string $string): int {
 
-    if($string === null) {
+    if ($string === null) {
       $string = '';
     }
 
@@ -168,7 +168,7 @@ class StringBody implements StreamInterface {
     $after = substr($this->message, $this->position + $written);
 
     $this->position = strlen($before) + $written - 1;
-    $this->message = $before . $string . $after;
+    $this->message = $before.$string.$after;
 
     return $written;
   }
@@ -193,7 +193,7 @@ class StringBody implements StreamInterface {
    * @throws \RuntimeException if an error occurs.
    */
   public function read(?int $length): string {
-    if($length === null) {
+    if ($length === null) {
       throw new \RuntimeException('Cannot read null length.');
     }
     $result = substr($this->message, $this->position, $length);
