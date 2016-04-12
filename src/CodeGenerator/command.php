@@ -4,11 +4,9 @@ namespace HackPack\HackMini\CodeGenerator;
 
 use HackPack\HackMini\Util;
 
-<<
-Command('commands:generate'),
+<<Command('commands:generate'),
 Arguments('name'),
-Options('p|path=', 'c|class')
->>
+Options('p|path=', 'c|class')>>
 function generateCommandHandler(
   \FactoryContainer $c,
   \HackPack\HackMini\Command\Request $req,

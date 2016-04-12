@@ -1,6 +1,8 @@
 composer.phar
 vendor/
 composer.lock
-**/www.pid
+*.pid
 .DS_Store
 ssl/
+build/*
+!build/.empty
