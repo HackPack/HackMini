@@ -4,5 +4,5 @@ composer.lock
 *.pid
 .DS_Store
 ssl/
-build/*
-!build/.empty
+/build
+!/build/.empty
