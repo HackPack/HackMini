@@ -1,12 +1,4 @@
 {
-  "roots": [
-    "src/",
-    "build/",
-    "test/",
-    "sample/"
-  ],
-  "extraFiles": [
-    "middleware.php"
-  ],
+  "roots": [""],
   "includeVendor": true
 }

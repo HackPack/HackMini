@@ -25,7 +25,8 @@ class CliApp {
     }
 
     if ($generateAutoload) {
-      system('hhvm /usr/local/bin/composer dumpautoload');
+      $composer = $this->findComposer();
+      system('hhvm ' . $composer . ' dumpautoload');
     }
   }
 
@@ -58,7 +59,35 @@ class CliApp {
     require_once $outfile;
   }
 
-  private function buildGlobalMiddleware(): void {}
+  private function buildGlobalMiddleware(): void {
+    $code = <<<Hack
+<?hh // strict
+
+use HackPack\HackMini\Contract\Middleware;
+use HackPack\HackMini\Command\Request as CliRequest;
+use HackPack\HackMini\Command\UserInteraction;
+use HackPack\HackMini\Message\Request as WebRequest;
+use HackPack\HackMini\Message\Response;
+
+function globalWebMiddleware(
+): Vector<Middleware<WebRequest, Response, Response>> {
+  return Vector {};
+}
+
+function globalCliMiddleware(
+): Vector<Middleware<CliRequest, UserInteraction, int>> {
+  return Vector {};
+}
+Hack;
+    $outfile = $this->request->projectRoot() . '/middleware.php';
+    $bytesWritten = file_put_contents($outfile, $code);
+    if($bytesWritten === false) {
+      $this->interaction->showLine('Unable to write global middleware file.');
+      exit(1);
+    }
+
+    require_once($outfile);
+  }
 
   private function buildFactoryContainer(): void {
     $this->interaction->showLine('Scanning project for service factories.');
@@ -72,5 +101,21 @@ class CliApp {
 
     /* HH_IGNORE_ERROR[1002] */
     require_once $outfile;
+  }
+
+  private function findComposer(): string {
+    $paths = [
+      $this->request->projectRoot() . '/composer.phar',
+      exec('which composer'),
+    ];
+
+    foreach($paths as $path) {
+      if(is_file($path)) {
+        return $path;
+      }
+    }
+
+    $this->interaction->showLine('Unable to locate composer.');
+    exit(1);
   }
 }
