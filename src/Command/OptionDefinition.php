@@ -7,4 +7,5 @@ type OptionDefinition = shape(
   'alias' => ?string,
   'value required' => bool,
   'default' => ?string,
+  'description' => string,
 );

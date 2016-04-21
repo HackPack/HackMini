@@ -242,12 +242,9 @@ final class DefinitionParser {
   private function parseOptionName(
     string $commandName,
     string $name,
-  ): shape(
-    'name' => string,
-    'alias' => ?string,
-    'value required' => bool,
-    'default' => ?string,
-  ) {
+  ): OptionDefinition {
+    list($name, $description) = $this->parseDescription($name);
+
     if ($this->optionHasAlias($name)) {
       $parts = explode('|', $name, 2);
       if (count($parts) < 2) {
@@ -276,7 +273,7 @@ final class DefinitionParser {
       $default = $parts[1] === '' ? null : $parts[1];
     }
 
-    $definition = shape('name' => $name, 'value required' => $valueRequired);
+    $definition = shape('name' => $name, 'value required' => $valueRequired, 'description' => $description);
 
     $this->checkName($commandName, $name, $name !== $alias);
 
@@ -326,6 +323,8 @@ final class DefinitionParser {
             );
           }
 
+          list($a, $description) = $this->parseDescription($a);
+
           if (strpos($a, '=') === false) {
             if ($required->at(0) === false) {
               throw new \UnexpectedValueException(
@@ -333,14 +332,14 @@ final class DefinitionParser {
               );
             }
             $this->checkName($commandName, $a, true);
-            return shape('name' => $a);
+            return shape('name' => $a, 'description' => $description);
           }
 
           $required->set(0, false);
 
           list($name, $default) = explode('=', $a, 2);
 
-          return shape('name' => $name, 'default' => $default);
+          return shape('name' => $name, 'default' => $default, 'description' => $description);
         },
       );
   }
@@ -414,5 +413,17 @@ final class DefinitionParser {
       $out->add($value);
     }
     return $out;
+  }
+
+  private function parseDescription(string $name): (string, string) {
+    $descriptionRegex = '/\[(.*)\]$/';
+    $matches = [];
+    $hasDescription = preg_match($descriptionRegex, $name, $matches);
+
+    if($hasDescription) {
+      return tuple(preg_replace($descriptionRegex, '', $name), $matches[1]);
+    }
+    return tuple($name, '');
+
   }
 }

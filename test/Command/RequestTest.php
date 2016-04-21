@@ -56,7 +56,7 @@ class RequestTest {
   <<Test>>
   public function missingArgument(Assert $assert): void {
     $req = new Request('', Vector {}, '', $this->parser);
-    $req = $req->withArguments(Vector {shape('name' => 'arg1')});
+    $req = $req->withArguments(Vector {shape('name' => 'arg1', 'description' => '')});
 
     $assert->whenCalled(
       () ==> {
@@ -79,7 +79,7 @@ class RequestTest {
   public function missingOption(Assert $assert): void {
     $req = new Request('', Vector {}, '', $this->parser);
     $req = $req->withOptions(
-      Vector {shape('name' => 'arg1', 'value required' => false)},
+      Vector {shape('name' => 'arg1', 'value required' => false, 'description' => '')},
     );
 
     $assert->whenCalled(
@@ -103,7 +103,7 @@ class RequestTest {
   public function singleArgument(Assert $assert): void {
     $req =
       (new Request('', Vector {'value'}, '', $this->parser))
-        ->withArguments(Vector {shape('name' => 'arg')});
+        ->withArguments(Vector {shape('name' => 'arg', 'description' => '')});
 
     $assert->whenCalled(
       () ==> {
@@ -118,7 +118,7 @@ class RequestTest {
   <<Test>>
   public function argumentDefault(Assert $assert): void {
     $req = (new Request('', Vector {}, '', $this->parser))->withArguments(
-      Vector {shape('name' => 'arg', 'default' => 'value')},
+      Vector {shape('name' => 'arg', 'default' => 'value', 'description' => '')},
     );
 
     $assert->whenCalled(
@@ -136,7 +136,7 @@ class RequestTest {
     $req =
       (new Request('', Vector {'val1', 'val 2'}, '', $this->parser))
         ->withArguments(
-          Vector {shape('name' => 'arg1'), shape('name' => 'arg2')},
+          Vector {shape('name' => 'arg1', 'description' => ''), shape('name' => 'arg2', 'description' => '')},
         );
 
     $assert->whenCalled(
@@ -155,10 +155,10 @@ class RequestTest {
     $req =
       (new Request('', Vector {'val1', '--opt', 'val 2'}, '', $this->parser))
         ->withArguments(
-          Vector {shape('name' => 'arg1'), shape('name' => 'arg2')},
+          Vector {shape('name' => 'arg1', 'description' => ''), shape('name' => 'arg2', 'description' => '')},
         )
         ->withOptions(
-          Vector {shape('name' => 'opt', 'value required' => false)},
+          Vector {shape('name' => 'opt', 'value required' => false, 'description' => '')},
         );
 
     $assert->whenCalled(
@@ -182,8 +182,8 @@ class RequestTest {
       '',
       $this->parser,
     ))->withArguments(
-      Vector {shape('name' => 'arg1'), shape('name' => 'arg2')},
-    )->withOptions(Vector {shape('name' => 'opt', 'value required' => true)});
+      Vector {shape('name' => 'arg1', 'description' => ''), shape('name' => 'arg2', 'description' => '')},
+    )->withOptions(Vector {shape('name' => 'opt', 'value required' => true, 'description' => '')});
 
     $assert->whenCalled(
       () ==> {
@@ -225,7 +225,7 @@ class RequestTest {
       $this->parser,
     ))->withOptions(
       Vector {
-        shape('name' => 'one', 'alias' => 'o', 'value required' => false),
+        shape('name' => 'one', 'alias' => 'o', 'value required' => false, 'description' => ''),
       },
     );
 
@@ -275,7 +275,7 @@ class RequestTest {
       $this->parser,
     ))->withOptions(
       Vector {
-        shape('name' => 'one', 'alias' => 'o', 'value required' => true),
+        shape('name' => 'one', 'alias' => 'o', 'value required' => true, 'description' => ''),
       },
     );
 
@@ -312,6 +312,7 @@ class RequestTest {
               'name' => 'one',
               'alias' => 'o',
               'value required' => true,
+              'description' => '',
             ),
           },
         );
@@ -333,6 +334,7 @@ class RequestTest {
               'name' => 'one',
               'alias' => 'o',
               'value required' => true,
+              'description' => '',
             ),
           },
         );
@@ -354,6 +356,7 @@ class RequestTest {
               'name' => 'one',
               'alias' => 'o',
               'value required' => true,
+              'description' => '',
             ),
           },
         );
@@ -373,6 +376,7 @@ class RequestTest {
               'name' => 'one',
               'alias' => 'o',
               'value required' => true,
+              'description' => '',
             ),
           },
         );

@@ -190,7 +190,7 @@ Hack;
     $this->checkOption(
       $assert,
       $options->at(0),
-      shape('name' => 'simple', 'value required' => false),
+      shape('name' => 'simple', 'value required' => false, 'description' => ''),
     );
   }
 
@@ -217,7 +217,7 @@ Hack;
     $this->checkOption(
       $assert,
       $options->at(0),
-      shape('name' => 'simple', 'alias' => 's', 'value required' => false),
+      shape('name' => 'simple', 'alias' => 's', 'value required' => false, 'description' => ''),
     );
   }
 
@@ -244,7 +244,7 @@ Hack;
     $this->checkOption(
       $assert,
       $options->at(0),
-      shape('name' => 'simple', 'value required' => true),
+      shape('name' => 'simple', 'value required' => true, 'description' => ''),
     );
   }
 
@@ -275,6 +275,7 @@ Hack;
         'name' => 'simple',
         'value required' => true,
         'default' => 'va l|u=e',
+        'description' => ''
       ),
     );
   }
@@ -537,16 +538,16 @@ Hack;
     $arguments = $parser->commands()->at(0)['arguments'];
     $assert->int($arguments->count())->eq(3);
 
-    $this->checkArgument($assert, $arguments->at(0), shape('name' => 'one'));
+    $this->checkArgument($assert, $arguments->at(0), shape('name' => 'one', 'description' => ''));
     $this->checkArgument(
       $assert,
       $arguments->at(1),
-      shape('name' => 'two', 'default' => 'default'),
+      shape('name' => 'two', 'default' => 'default', 'description' => ''),
     );
     $this->checkArgument(
       $assert,
       $arguments->at(2),
-      shape('name' => 'three', 'default' => 'three'),
+      shape('name' => 'three', 'default' => 'three', 'description' => ''),
     );
   }
 
@@ -603,6 +604,39 @@ Hack;
     $assert->string($middleware->at(0))->is('one');
     $assert->string($middleware->at(1))->is('two');
   }
+
+  <<Test>>
+  private function parseOptionDescription(Assert $assert): void {
+    $code = <<<'Hack'
+<?hh
+<<Command('name'), Options('one[describe one]', 'two=[describe two]', 'three=stuff[describe three]')>>
+function someHandler(
+    FactoryContainer $c,
+    HackPack\HackMini\Command\Request $r,
+    HackPack\HackMini\Command\UserInteraction $i,
+) : int { }
+Hack;
+    $parser = $this->parse($code);
+    $assert->int($parser->failures()->count())->eq(0);
+    $assert->int($parser->commands()->count())->eq(1);
+
+    $options = $parser->commands()->at(0)['options'];
+
+    $assert->int($options->count())->eq(3);
+
+    $assert->bool($options->at(0)['value required'])->is(false);
+    $assert->mixed(Shapes::idx($options->at(0), 'default'))->isNull();
+    $assert->string($options->at(0)['description'])->is('describe one');
+
+    $assert->bool($options->at(1)['value required'])->is(true);
+    $assert->mixed(Shapes::idx($options->at(1), 'default'))->isNull();
+    $assert->string($options->at(1)['description'])->is('describe two');
+
+    $assert->bool($options->at(2)['value required'])->is(true);
+    $assert->mixed(Shapes::idx($options->at(2), 'default'))->identicalTo('stuff');
+    $assert->string($options->at(2)['description'])->is('describe three');
+  }
+
   private function parse(string $code): DefinitionParser {
     $fileParser = FileParser::FromData($code);
     $functions = $fileParser->getFunctions();

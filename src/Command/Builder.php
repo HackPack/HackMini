@@ -73,6 +73,7 @@ Hack;
 
   private function renderOption(OptionDefinition $definition): string {
     $name = $definition['name'];
+    $description = $definition['description'];
     $alias = Shapes::idx($definition, 'alias');
     $default = Shapes::idx($definition, 'default');
     $valueRequired = var_export($definition['value required'], true);
@@ -88,6 +89,8 @@ Hack;
     if ($default !== null) {
       $lines->add("'default' => '{$default}',");
     }
+
+    $lines->add("'description' => '{$description}',");
 
     return implode(
       PHP_EOL,
@@ -114,6 +117,7 @@ Hack;
 
   private function renderArgument(ArgumentDefinition $definition): string {
     $name = $definition['name'];
+    $description = $definition['description'];
     $default = Shapes::idx($definition, 'default');
 
     $lines = Vector {"'name' => '{$name}',"};
@@ -121,6 +125,8 @@ Hack;
     if ($default !== null) {
       $lines->add("'default' => '{$default}',");
     }
+
+    $lines->add("'description' => '{$description}',");
 
     return implode(
       PHP_EOL,

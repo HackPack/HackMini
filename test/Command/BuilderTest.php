@@ -109,8 +109,8 @@ Hack;
           'middleware' => Vector {},
           'function' => 'f',
           'arguments' => Vector {
-            shape('name' => 'one'),
-            shape('name' => 'two', 'default' => 'stuff'),
+            shape('name' => 'one', 'description' => ''),
+            shape('name' => 'two', 'default' => 'stuff', 'description' => ''),
           },
           'options' => Vector {},
         ),
@@ -122,10 +122,12 @@ Hack;
             'arguments' => Vector{
                 shape(
                     'name' => 'one',
+                    'description' => '',
                 ),
                 shape(
                     'name' => 'two',
                     'default' => 'stuff',
+                    'description' => '',
                 ),
             },
 
@@ -148,11 +150,13 @@ Hack;
               'name' => 'one',
               'alias' => 'o',
               'value required' => true,
+              'description' => '',
             ),
             shape(
               'name' => 'two',
               'value required' => false,
               'default' => 'stuff',
+              'description' => '',
             ),
           },
         ),
@@ -166,11 +170,13 @@ Hack;
                     'name' => 'one',
                     'alias' => 'o',
                     'value required' => true,
+                    'description' => '',
                 ),
                 shape(
                     'name' => 'two',
                     'value required' => false,
                     'default' => 'stuff',
+                    'description' => '',
                 ),
             },
 
