@@ -6,11 +6,10 @@ use HackPack\HackMini\Command\Request;
 use HackPack\HackMini\Command\UserInteraction;
 use HackPack\HackMini\Middleware\DefinitionParser as MiddlewareParser;
 use FredEmmott\DefinitionFinder\FileParser;
-
 use HackPack\HackMini\Util;
 
 <<Command('commands:build'), Options('i|include-path=', 'e|exclude-path=')>>
-function buildCommandsCommand(
+function buildCommandsHandler(
   \FactoryContainer $c,
   \HackPack\HackMini\Command\Request $req,
   \HackPack\HackMini\Command\UserInteraction $rsp,
@@ -48,6 +47,7 @@ function buildCommands(Vector<\SplFileInfo> $fileList, string $outfile): int {
   $builder =
     new Builder($commandParser->commands(), $middlewareParser->middleware());
 
+  Util\recursiveMakeDir(dirname($outfile));
   $fp = fopen($outfile, 'w');
   fwrite($fp, $builder->render());
   fclose($fp);

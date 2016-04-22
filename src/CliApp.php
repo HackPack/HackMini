@@ -2,6 +2,8 @@
 
 namespace HackPack\HackMini;
 
+require_once __DIR__ . '/Command/buildCommands.php';
+
 class CliApp {
   public function __construct(
     private Command\Request $request,
@@ -11,6 +13,11 @@ class CliApp {
 
     if (!function_exists('commands')) {
       $this->buildCommands();
+      $generateAutoload = true;
+    }
+
+    if (!function_exists('routes')) {
+      $this->buildRoutes();
       $generateAutoload = true;
     }
 
@@ -50,10 +57,22 @@ class CliApp {
     $outfile = $this->request->projectRoot().'/build/commands.php';
     $dirsToScan = $this->request->projectRoot();
     $filesToScan = Util\listPhpFiles(Vector {$dirsToScan}, null);
-    if (Command\buildCommands($filesToScan, $outfile)) {
+    if (\HackPack\HackMini\Command\buildCommands($filesToScan, $outfile)) {
       exit(1);
     }
-    ;
+
+    /* HH_IGNORE_ERROR[1002] */
+    require_once $outfile;
+  }
+
+  private function buildRoutes(): void {
+    $this->interaction->showLine('Scanning project for routes.');
+    $outfile = $this->request->projectRoot().'/build/routes.php';
+    $dirsToScan = $this->request->projectRoot();
+    $filesToScan = Util\listPhpFiles(Vector {$dirsToScan}, null);
+    if (Routes\buildRoutes($filesToScan, $outfile)) {
+      exit(1);
+    }
 
     /* HH_IGNORE_ERROR[1002] */
     require_once $outfile;
@@ -97,7 +116,6 @@ Hack;
     if (\HackPack\HackMini\Container\buildContainer($filesToScan, $outfile)) {
       exit(1);
     }
-    ;
 
     /* HH_IGNORE_ERROR[1002] */
     require_once $outfile;

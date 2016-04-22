@@ -6,11 +6,11 @@ use HackPack\HackMini\Command\Request;
 use HackPack\HackMini\Command\UserInteraction;
 use HackPack\HackMini\Middleware\DefinitionParser as MiddlewareParser;
 use HackPack\HackMini\Routes\Builder;
-
 use HackPack\HackMini\Util;
+use FredEmmott\DefinitionFinder\FileParser;
 
 <<Command('routes:build'), Options('i|include-path=', 'e|exclude-path=')>>
-function buildRoutes(
+function buildRoutesHandler(
   \FactoryContainer $c,
   \HackPack\HackMini\Command\Request $req,
   \HackPack\HackMini\Command\UserInteraction $interaction,
@@ -19,24 +19,39 @@ function buildRoutes(
   $fileList =
     Util\listPhpFiles($req->get('include-path'), $req->get('exclude-path'));
 
-  $middlewareParser = MiddlewareParser::fromFileList($fileList);
+  return buildRoutes($fileList, $outfile);
+}
+
+function buildRoutes(Vector<\SplFileInfo> $fileList, string $outfile): int {
+    $functions = Vector {};
+    $classes = Vector {};
+
+    foreach ($fileList as $finfo) {
+      if ($finfo->isFile() && $finfo->isReadable()) {
+        $fileParser = FileParser::FromFile($finfo->getRealPath());
+        $functions->addAll($fileParser->getFunctions());
+        $classes->addAll($fileParser->getClasses());
+      }
+    }
+
+  $middlewareParser = new MiddlewareParser($functions, $classes);
   if ($middlewareParser->failures()) {
     var_dump($middlewareParser->failures());
     return 1;
   }
 
-  $routeParser = DefinitionParser::fromFileList($fileList);
-  if ($routeParser->failures()) {
-    var_dump($routeParser->failures());
+  $commandParser = new DefinitionParser($functions, $classes);
+  if ($commandParser->failures()) {
+    var_dump($commandParser->failures());
     return 1;
   }
 
   $builder =
-    new Builder($routeParser->routes(), $middlewareParser->middleware());
+    new Builder($commandParser->routes(), $middlewareParser->middleware());
 
+  Util\recursiveMakeDir(dirname($outfile));
   $fp = fopen($outfile, 'w');
   fwrite($fp, $builder->render());
   fclose($fp);
-
   return 0;
 }

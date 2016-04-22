@@ -6,4 +6,4 @@ composer.lock
 ssl/
 /build
 !/build/.empty
-middleware.php
+/middleware.php

@@ -12,7 +12,7 @@ function helpHandler(
   \HackPack\HackMini\Command\Request $req,
   \HackPack\HackMini\Command\UserInteraction $rsp,
 ): int {
-  $commands = commands();
+  $commands = \commands();
 
   $name = $req->getFirst('command');
 

@@ -12,12 +12,13 @@ function generateCommandHandler(
   \HackPack\HackMini\Command\Request $req,
   \HackPack\HackMini\Command\UserInteraction $interaction,
 ): int {
+  $name = $req->atFirst('name');
   $path = $req->getFirst('path');
   if ($path === null) {
     $path =
       $interaction->ask(
         sprintf(
-          'In which directory would you like to put the new route handler? (relative to %s)',
+          'In which directory would you like to put the new command handler? (relative to %s)',
           getcwd(),
         ),
       );
@@ -34,11 +35,11 @@ function generateCommandHandler(
   }
   if (!Util\recursiveMakeDir($path)) {
     $interaction->showLine(
-      'Unable to create the directory to contain the new route Handler.',
+      'Unable to create the directory to contain the new command Handler.',
     );
   }
 
-  $parts = explode('\\', $req->atFirst('name'));
+  $parts = explode('\\', $name);
   $name = array_pop($parts);
   $namespace =
     count($parts) > 0
