@@ -7,8 +7,9 @@
   ],
   "name": "hackpack/hackmini",
   "description": "Mini framework for Hacklang.",
-  "type": "project",
+  "type": "library",
   "keywords": ["framework", "microframework", "micro", "psr7", "router", "middleware"],
+  "bin": ["bin/hackmini"],
   "require": {
     "hhvm": ">=3.11",
     "psr/http-message": "^1.0",
