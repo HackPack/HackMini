@@ -31,5 +31,8 @@
   },
   "scripts": {
     "test": "vendor/bin/hackunit test"
+  },
+  "archive": {
+    "exclude": ["/test"]
   }
 }
