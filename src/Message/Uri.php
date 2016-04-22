@@ -103,14 +103,14 @@ final class Uri implements UriInterface {
     return $this->fragment;
   }
 
-  public function withScheme(?string $scheme): this {
+  public function withScheme(string $scheme): this {
     $scheme = $this->validateScheme($scheme);
     $new = clone $this;
     $new->scheme = $scheme;
     return $new;
   }
 
-  private function validateScheme(?string $scheme): string {
+  private function validateScheme(string $scheme): string {
     // TODO: decide which schemes are supported.  Throw \InvalidArgumentException when not.
     if ($scheme === null) {
       throw new \InvalidArgumentException('Scheme may not be null');
@@ -118,21 +118,21 @@ final class Uri implements UriInterface {
     return $scheme;
   }
 
-  public function withUserInfo(?string $user, ?string $password = null): this {
+  public function withUserInfo(string $user, ?string $password = null): this {
     $new = clone $this;
     $new->user = (string) $user;
     $new->password = (string) $password;
     return $new;
   }
 
-  public function withHost(?string $host): this {
+  public function withHost(string $host): this {
     $host = $this->validateHost($host);
     $new = clone $this;
     $new->host = $host;
     return $new;
   }
 
-  private function validateHost(?string $host): string {
+  private function validateHost(string $host): string {
     if ($host === null) {
       throw new \InvalidArgumentException('Host may not be null.');
     }
@@ -157,37 +157,37 @@ final class Uri implements UriInterface {
     }
   }
 
-  public function withPath(?string $path): this {
+  public function withPath(string $path): this {
     $new = clone $this;
     $new->path = $this->encodePath($path);
     return $new;
   }
 
-  private function encodePath(?string $path): string {
+  private function encodePath(string $path): string {
     // TODO: ensure the path is correctly encoded
     // TODO: throw \InvalidArgumentException when $path is invalid
     return (string) $path;
   }
 
-  public function withQuery(?string $query): this {
+  public function withQuery(string $query): this {
     $new = clone $this;
     $new->query = $this->encodeQuery($query);
     return $new;
   }
 
-  private function encodeQuery(?string $query): string {
+  private function encodeQuery(string $query): string {
     // TODO: properly encode the query string
     // TODO: throw \InvalidArgumentException for invalid query strings
     return (string) $query;
   }
 
-  public function withFragment(?string $fragment): this {
+  public function withFragment(string $fragment): this {
     $new = clone $this;
     $new->fragment = $this->encodeFragment($fragment);
     return $new;
   }
 
-  private function encodeFragment(?string $fragment): string {
+  private function encodeFragment(string $fragment): string {
     // TODO: properly encode fragment
     return (string) $fragment;
   }

@@ -1,10 +1,4 @@
 {
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "git@github.com:HackPack/psr7-http-message-hhi.git"
-    }
-  ],
   "name": "hackpack/hackmini",
   "description": "Mini framework for Hacklang.",
   "type": "library",
@@ -14,7 +8,7 @@
     "hhvm": ">=3.11",
     "psr/http-message": "^1.0",
     "fredemmott/definition-finder": "dev-master as 1.1.0",
-    "hack-psr/psr7-http-message-hhi": "dev-nullable-scalar-types",
+    "hack-psr/psr7-http-message-hhi": "^0.2.0",
     "fredemmott/hhvm-autoload": "^0.1.0"
   },
   "autoload": {

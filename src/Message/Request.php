@@ -36,7 +36,7 @@ final class Request implements RequestInterface {
     return $this->method;
   }
 
-  public function withMethod(?string $verb): this {
+  public function withMethod(string $verb): this {
     if ($verb === null) {
       $verb = '';
     }
@@ -100,7 +100,7 @@ final class Request implements RequestInterface {
 
   public function withUri(
     UriInterface $uri,
-    ?bool $preserveHost = false,
+    bool $preserveHost = false,
   ): this {
     $new = clone $this;
     $new->uri = Uri::fromPsr($uri);

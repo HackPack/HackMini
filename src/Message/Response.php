@@ -52,7 +52,7 @@ final class Response implements ResponseInterface {
     return $this->status;
   }
 
-  public function withStatus(?int $code, ?string $reasonPhrase = ''): this {
+  public function withStatus(int $code, string $reasonPhrase = ''): this {
     $new = clone $this;
     $new->status = $this->validateStatusCode($code);
     $new->reason = (string) $reasonPhrase;

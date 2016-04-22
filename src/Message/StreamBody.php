@@ -135,7 +135,7 @@ class StreamBody implements StreamInterface {
    *     SEEK_END: Set position to end-of-stream plus offset.
    * @throws \RuntimeException on failure.
    */
-  public function seek(?int $offset, ?int $whence = SEEK_SET): void {
+  public function seek(int $offset, int $whence = SEEK_SET): void {
     if ($offset === null) {
       throw new \RuntimeException('Null offset');
     }
@@ -184,7 +184,7 @@ class StreamBody implements StreamInterface {
    * @return int Returns the number of bytes written to the stream.
    * @throws \RuntimeException on failure.
    */
-  public function write(?string $string): int {
+  public function write(string $string): int {
     if ($string === null) {
       $string = '';
     }
@@ -227,7 +227,7 @@ class StreamBody implements StreamInterface {
    *     if no bytes are available.
    * @throws \RuntimeException if an error occurs.
    */
-  public function read(?int $length): string {
+  public function read(int $length): string {
     if ($length === null) {
       return '';
     }

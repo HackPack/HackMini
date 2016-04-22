@@ -34,7 +34,7 @@ trait Message {
    * @param string $version HTTP protocol version
    * @return self
    */
-  public function withProtocolVersion(?string $version): this {
+  public function withProtocolVersion(string $version): this {
     $new = clone $this;
     $newVersion = HttpProtocolVersion::coerce($version);
 
@@ -86,7 +86,7 @@ trait Message {
    *     name using a case-insensitive string comparison. Returns false if
    *     no matching header name is found in the message.
    */
-  public function hasHeader(?string $name): bool {
+  public function hasHeader(string $name): bool {
     return $this->headerValues->containsKey(strtolower($name));
   }
 
@@ -104,7 +104,7 @@ trait Message {
    *    header. If the header does not appear in the message, this method MUST
    *    return an empty array.
    */
-  public function getHeader(?string $name): array<string> {
+  public function getHeader(string $name): array<string> {
     $values = $this->headerValues->get(strtolower($name));
     if ($values === null) {
       return [];
@@ -131,7 +131,7 @@ trait Message {
    *    concatenated together using a comma. If the header does not appear in
    *    the message, this method MUST return an empty string.
    */
-  public function getHeaderLine(?string $name): string {
+  public function getHeaderLine(string $name): string {
     return implode(',', $this->getHeader($name));
   }
 
@@ -150,7 +150,7 @@ trait Message {
    * @return self
    * @throws \InvalidArgumentException for invalid header names or values.
    */
-  public function withHeader(?string $name, mixed $value): this {
+  public function withHeader(string $name, mixed $value): this {
     if ($name === null) {
       throw new \InvalidArgumentException('Header names may not be null.');
     }
@@ -184,7 +184,7 @@ trait Message {
    * @return self
    * @throws \InvalidArgumentException for invalid header names or values.
    */
-  public function withAddedHeader(?string $name, mixed $value): this {
+  public function withAddedHeader(string $name, mixed $value): this {
     if ($name === null) {
       throw new \InvalidArgumentException('Header names may not be null.');
     }
@@ -216,7 +216,7 @@ trait Message {
    * @param string $name Case-insensitive header field name to remove.
    * @return self
    */
-  public function withoutHeader(?string $name): this {
+  public function withoutHeader(string $name): this {
     $lowerName = strtolower($name);
     $new = clone $this;
     $new->headerValues->removeKey($lowerName);
