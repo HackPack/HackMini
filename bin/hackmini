@@ -1,24 +1,26 @@
 #!/usr/bin/env hhvm
 <?hh
 
-if(php_sapi_name() !== 'cli') {
-    exit('Use this executable from the command line only.');
+if (php_sapi_name() !== 'cli') {
+  exit('Use this executable from the command line only.');
 }
 
 // Find project root by looking for the composer autoloader
 $path = __DIR__;
 
-while($path !== '/') {
-    if(is_file($path . '/vendor/hh_autoload.php')) {
-        require_once $path . '/vendor/hh_autoload.php';
-        break;
-    }
-    $path = dirname($path);
+while ($path !== '/') {
+  if (is_file($path.'/vendor/hh_autoload.php')) {
+    require_once $path.'/vendor/hh_autoload.php';
+    break;
+  }
+  $path = dirname($path);
 }
 
-if($path === '/') {
-    echo 'Unable to locate hh_autoload.php.  Please see the documentation for installing HackMini.';
-    exit(1);
+if ($path === '/') {
+  echo
+    'Unable to locate hh_autoload.php.  Please see the documentation for installing HackMini.'
+  ;
+  exit(1);
 }
 
 $request = HackPack\HackMini\Command\Request::fromEnv($argv, $path);

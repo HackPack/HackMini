@@ -3,10 +3,11 @@
 namespace HackPack\HackMini\Contract;
 
 use HackPack\HackMini\Middleware\Next;
+use FactoryContainer;
 
-type MiddlewareFactory<Trequest, Tresponse, Tresult> = (
-  function(\FactoryContainer): Middleware<Trequest, Tresponse, Tresult>
-);
+type MiddlewareFactory<Treq, Trsp, Tres> = (function(FactoryContainer): Middleware<Treq,
+Trsp,
+Tres>);
 
 interface Middleware<Trequest, Tresponse, Tresult> {
   public function handle(

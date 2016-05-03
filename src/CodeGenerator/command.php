@@ -71,7 +71,7 @@ function functionCommandHandler(string $name, string $namespace): string {
   return<<<Hack
 <?hh // strict
 {$namespace}
-<<Command('{$name}') /*, Arguments(), Options()*/ >>
+<<Command('{$name}')>>
 function {$name}Handler(
   \\FactoryContainer \$c,
   \\HackPack\\HackMini\\Command\\Request \$req,

@@ -6,7 +6,7 @@ use HackPack\HackMini\Validator\Validator;
 use HackPack\HackMini\Contract\Message\Stream;
 use FactoryContainer;
 
-final class Request  {
+final class Request {
   use Message;
 
   private Vector<string> $pathGroups = Vector {};
@@ -81,10 +81,7 @@ final class Request  {
     return $this->uri;
   }
 
-  public function withUri(
-    Uri $uri,
-    bool $preserveHost = false,
-  ): this {
+  public function withUri(Uri $uri, bool $preserveHost = false): this {
     $new = clone $this;
     $new->uri = $uri;
 
@@ -92,7 +89,8 @@ final class Request  {
     if (// Don't touch the host header
         $preserveHost &&
         // Unless we don't have one
-        $currentHeader !== null && $currentHeader !== '') {
+        $currentHeader !== null &&
+        $currentHeader !== '') {
       return $new;
     }
 
