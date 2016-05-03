@@ -5,11 +5,7 @@ namespace HackPack\HackMini\Message;
 use Psr\Http\Message\UriInterface;
 
 // TODO: ensure this complies with the PSR-7 standard
-final class Uri implements UriInterface {
-  public static function fromPsr(UriInterface $other): this {
-    // TODO: be more efficient about this
-    return self::fromString((string) $other);
-  }
+final class Uri {
 
   public static function fromString(string $uri): this {
     $port = null;

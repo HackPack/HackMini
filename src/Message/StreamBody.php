@@ -2,9 +2,9 @@
 
 namespace HackPack\HackMini\Message;
 
-use Psr\Http\Message\StreamInterface;
+use HackPack\HackMini\Contract\Message\Stream;
 
-class StreamBody implements StreamInterface {
+class StreamBody implements Stream {
   private ?resource $stream;
   private bool $seekable = false;
   private bool $readable = false;

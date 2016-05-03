@@ -2,7 +2,7 @@
 
 namespace HackPack\HackMini\Message;
 
-use Psr\Http\Message\StreamInterface;
+use HackPack\HackMini\Contract\Message\Stream;
 
 /**
  * SEEK_SET: Set position equal to offset bytes
@@ -15,7 +15,7 @@ enum SeekWhence : int as int {
   END = SEEK_END;
 }
 
-class StringBody implements StreamInterface {
+class StringBody implements Stream {
 
   private int $position = 0;
 

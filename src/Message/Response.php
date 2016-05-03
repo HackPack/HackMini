@@ -1,10 +1,9 @@
 <?hh // strict
 
 namespace HackPack\HackMini\Message;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
+use HackPack\HackMini\Contract\Message\Stream;
 
-final class Response implements ResponseInterface {
+final class Response {
   use Message;
 
   <<Provides('ServerResponse')>>
@@ -27,7 +26,7 @@ final class Response implements ResponseInterface {
     private Uri $uri,
     private Map<string, Vector<string>> $headerValues,
     private Map<string, string> $headerKeys,
-    private StreamInterface $body,
+    private Stream $body,
   ) {}
 
   /**

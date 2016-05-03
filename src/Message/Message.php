@@ -2,13 +2,13 @@
 
 namespace HackPack\HackMini\Message;
 
-use Psr\Http\Message\StreamInterface;
+use HackPack\HackMini\Contract\Message\Stream;
 
 trait Message {
   private HttpProtocolVersion $protocolVersion;
   private Map<string, Vector<string>> $headerValues;
   private Map<string, string> $headerKeys;
-  private StreamInterface $body;
+  private Stream $body;
 
   /**
    * Retrieves the HTTP protocol version as a string.
@@ -229,7 +229,7 @@ trait Message {
    *
    * @return StreamInterface Returns the body as a stream.
    */
-  public function getBody(): StreamInterface {
+  public function getBody(): Stream {
     return $this->body;
   }
 
@@ -246,7 +246,7 @@ trait Message {
    * @return self
    * @throws \InvalidArgumentException When the body is not valid.
    */
-  public function withBody(StreamInterface $body): this {
+  public function withBody(Stream $body): this {
     $new = clone $this;
     $new->body = $body;
     return $new;

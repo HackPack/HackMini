@@ -3,12 +3,10 @@
 namespace HackPack\HackMini\Message;
 
 use HackPack\HackMini\Validator\Validator;
+use HackPack\HackMini\Contract\Message\Stream;
 use FactoryContainer;
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\UriInterface;
 
-final class Request implements RequestInterface {
+final class Request  {
   use Message;
 
   private Vector<string> $pathGroups = Vector {};
@@ -21,7 +19,7 @@ final class Request implements RequestInterface {
     private Uri $uri,
     private Map<string, Vector<string>> $headerValues,
     private Map<string, string> $headerKeys,
-    StreamInterface $body,
+    Stream $body,
   ) {
     $this->body = $body;
     $this->target = $uri->getPath().$uri->getQueryWithQuestion();
@@ -79,41 +77,22 @@ final class Request implements RequestInterface {
     return $this->target;
   }
 
-  public function withRequestTarget(mixed $target): this {
-    if ($target instanceof UriInterface) {
-      $target = (string) $target;
-    }
-    if (!is_string($target)) {
-      throw new \InvalidArgumentException(
-        'The request target must be a string or an instance of UriInterface',
-      );
-    }
-
-    $new = clone $this;
-    $new->target = $target;
-    return $new;
-  }
-
   public function getUri(): Uri {
     return $this->uri;
   }
 
   public function withUri(
-    UriInterface $uri,
+    Uri $uri,
     bool $preserveHost = false,
   ): this {
     $new = clone $this;
-    $new->uri = Uri::fromPsr($uri);
-
-    if ($preserveHost === null) {
-      $preserveHost = false;
-    }
+    $new->uri = $uri;
 
     $currentHeader = $new->getHeaderLine('Host');
     if (// Don't touch the host header
         $preserveHost &&
         // Unless we don't have one
-        ($currentHeader === null || $currentHeader === '')) {
+        $currentHeader !== null && $currentHeader !== '') {
       return $new;
     }
 
