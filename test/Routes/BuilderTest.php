@@ -20,23 +20,24 @@ class BuilderTest {
 
   <<Test>>
   public function middlewareStack(Assert $assert): void {
-    $code = (new Builder(
-      Vector {
-        shape(
-          'function' => 'handler',
-          'middleware' => Vector {'one', 'two'},
-          'pattern' => '/one',
-          'verb' => RestMethod::Get,
-        ),
-        shape(
-          'function' => 'handlerTwo',
-          'middleware' => Vector {'two'},
-          'pattern' => '/two',
-          'verb' => RestMethod::Get,
-        ),
-      },
-      Map {'one' => 'oneMiddleware', 'two' => 'twoMiddleware'},
-    ))->render();
+    $code =
+      (new Builder(
+        Vector {
+          shape(
+            'function' => 'handler',
+            'middleware' => Vector {'one', 'two'},
+            'pattern' => '/one',
+            'verb' => RestMethod::Get,
+          ),
+          shape(
+            'function' => 'handlerTwo',
+            'middleware' => Vector {'two'},
+            'pattern' => '/two',
+            'verb' => RestMethod::Get,
+          ),
+        },
+        Map {'one' => 'oneMiddleware', 'two' => 'twoMiddleware'},
+      ))->render();
 
     $one = <<<'Hack'
         'middleware' => Vector {
@@ -57,17 +58,18 @@ Hack;
 
   <<Test>>
   public function functionHandler(Assert $assert): void {
-    $code = (new Builder(
-      Vector {
-        shape(
-          'function' => 'handler',
-          'middleware' => Vector {},
-          'pattern' => '/pattern',
-          'verb' => RestMethod::Get,
-        ),
-      },
-      Map {},
-    ))->render();
+    $code =
+      (new Builder(
+        Vector {
+          shape(
+            'function' => 'handler',
+            'middleware' => Vector {},
+            'pattern' => '/pattern',
+            'verb' => RestMethod::Get,
+          ),
+        },
+        Map {},
+      ))->render();
 
     $expected = <<<'Hack'
       '/pattern' => shape(
@@ -81,18 +83,19 @@ Hack;
 
   <<Test>>
   public function methodHandler(Assert $assert): void {
-    $code = (new Builder(
-      Vector {
-        shape(
-          'class' => 'HandlerClass',
-          'method' => 'handler',
-          'middleware' => Vector {},
-          'pattern' => '/pattern',
-          'verb' => RestMethod::Get,
-        ),
-      },
-      Map {},
-    ))->render();
+    $code =
+      (new Builder(
+        Vector {
+          shape(
+            'class' => 'HandlerClass',
+            'method' => 'handler',
+            'middleware' => Vector {},
+            'pattern' => '/pattern',
+            'verb' => RestMethod::Get,
+          ),
+        },
+        Map {},
+      ))->render();
 
     $expected = <<<'Hack'
       '/pattern' => shape(
@@ -148,23 +151,24 @@ Hack;
 
   <<Test>>
   public function restMethods(Assert $assert): void {
-    $code = (new Builder(
-      Vector {
-        shape(
-          'middleware' => Vector {},
-          'pattern' => '/',
-          'verb' => RestMethod::Post,
-          'function' => 'handler',
-        ),
-        shape(
-          'middleware' => Vector {},
-          'pattern' => '/',
-          'verb' => RestMethod::Get,
-          'function' => 'handler',
-        ),
-      },
-      Map {},
-    ))->render();
+    $code =
+      (new Builder(
+        Vector {
+          shape(
+            'middleware' => Vector {},
+            'pattern' => '/',
+            'verb' => RestMethod::Post,
+            'function' => 'handler',
+          ),
+          shape(
+            'middleware' => Vector {},
+            'pattern' => '/',
+            'verb' => RestMethod::Get,
+            'function' => 'handler',
+          ),
+        },
+        Map {},
+      ))->render();
 
     $get = <<<'Hack'
     RestMethod::Get => Map {

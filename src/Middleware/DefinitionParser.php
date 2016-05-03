@@ -164,12 +164,13 @@ final class DefinitionParser {
   private function checkParameters(
     \ConstVector<ScannedParameter> $parameters,
   ): void {
-    $requiredParamNames = $parameters->filter($p ==> !$p->isOptional())->map(
-      $p ==> {
-        $name = $p->getTypehint()?->getTypeName();
-        return $name === null ? '' : ltrim($name, '\\');
-      },
-    );
+    $requiredParamNames =
+      $parameters->filter($p ==> !$p->isOptional())->map(
+        $p ==> {
+          $name = $p->getTypehint()?->getTypeName();
+          return $name === null ? '' : ltrim($name, '\\');
+        },
+      );
 
     if ($requiredParamNames->count() !== 1 ||
         $requiredParamNames->at(0) !== 'FactoryContainer') {

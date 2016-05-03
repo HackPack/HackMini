@@ -273,7 +273,11 @@ final class DefinitionParser {
       $default = $parts[1] === '' ? null : $parts[1];
     }
 
-    $definition = shape('name' => $name, 'value required' => $valueRequired, 'description' => $description);
+    $definition = shape(
+      'name' => $name,
+      'value required' => $valueRequired,
+      'description' => $description,
+    );
 
     $this->checkName($commandName, $name, $name !== $alias);
 
@@ -339,7 +343,11 @@ final class DefinitionParser {
 
           list($name, $default) = explode('=', $a, 2);
 
-          return shape('name' => $name, 'default' => $default, 'description' => $description);
+          return shape(
+            'name' => $name,
+            'default' => $default,
+            'description' => $description,
+          );
         },
       );
   }
@@ -347,12 +355,13 @@ final class DefinitionParser {
   private function checkParameters(
     \ConstVector<ScannedParameter> $parameters,
   ): void {
-    $requiredParamNames = $parameters->filter($p ==> !$p->isOptional())->map(
-      $p ==> {
-        $name = $p->getTypehint()?->getTypeName();
-        return $name === null ? '' : ltrim($name, '\\');
-      },
-    );
+    $requiredParamNames =
+      $parameters->filter($p ==> !$p->isOptional())->map(
+        $p ==> {
+          $name = $p->getTypehint()?->getTypeName();
+          return $name === null ? '' : ltrim($name, '\\');
+        },
+      );
 
     if ($requiredParamNames->count() !== 3 ||
         $requiredParamNames->at(0) !== \FactoryContainer::class ||
@@ -420,7 +429,7 @@ final class DefinitionParser {
     $matches = [];
     $hasDescription = preg_match($descriptionRegex, $name, $matches);
 
-    if($hasDescription) {
+    if ($hasDescription) {
       return tuple(preg_replace($descriptionRegex, '', $name), $matches[1]);
     }
     return tuple($name, '');

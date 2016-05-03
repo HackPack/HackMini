@@ -190,7 +190,11 @@ Hack;
     $this->checkOption(
       $assert,
       $options->at(0),
-      shape('name' => 'simple', 'value required' => false, 'description' => ''),
+      shape(
+        'name' => 'simple',
+        'value required' => false,
+        'description' => '',
+      ),
     );
   }
 
@@ -217,7 +221,12 @@ Hack;
     $this->checkOption(
       $assert,
       $options->at(0),
-      shape('name' => 'simple', 'alias' => 's', 'value required' => false, 'description' => ''),
+      shape(
+        'name' => 'simple',
+        'alias' => 's',
+        'value required' => false,
+        'description' => '',
+      ),
     );
   }
 
@@ -244,7 +253,11 @@ Hack;
     $this->checkOption(
       $assert,
       $options->at(0),
-      shape('name' => 'simple', 'value required' => true, 'description' => ''),
+      shape(
+        'name' => 'simple',
+        'value required' => true,
+        'description' => '',
+      ),
     );
   }
 
@@ -275,7 +288,7 @@ Hack;
         'name' => 'simple',
         'value required' => true,
         'default' => 'va l|u=e',
-        'description' => ''
+        'description' => '',
       ),
     );
   }
@@ -538,7 +551,11 @@ Hack;
     $arguments = $parser->commands()->at(0)['arguments'];
     $assert->int($arguments->count())->eq(3);
 
-    $this->checkArgument($assert, $arguments->at(0), shape('name' => 'one', 'description' => ''));
+    $this->checkArgument(
+      $assert,
+      $arguments->at(0),
+      shape('name' => 'one', 'description' => ''),
+    );
     $this->checkArgument(
       $assert,
       $arguments->at(1),
@@ -633,7 +650,8 @@ Hack;
     $assert->string($options->at(1)['description'])->is('describe two');
 
     $assert->bool($options->at(2)['value required'])->is(true);
-    $assert->mixed(Shapes::idx($options->at(2), 'default'))->identicalTo('stuff');
+    $assert->mixed(Shapes::idx($options->at(2), 'default'))
+      ->identicalTo('stuff');
     $assert->string($options->at(2)['description'])->is('describe three');
   }
 

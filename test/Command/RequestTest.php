@@ -56,7 +56,9 @@ class RequestTest {
   <<Test>>
   public function missingArgument(Assert $assert): void {
     $req = new Request('', Vector {}, '', $this->parser);
-    $req = $req->withArguments(Vector {shape('name' => 'arg1', 'description' => '')});
+    $req = $req->withArguments(
+      Vector {shape('name' => 'arg1', 'description' => '')},
+    );
 
     $assert->whenCalled(
       () ==> {
@@ -79,7 +81,13 @@ class RequestTest {
   public function missingOption(Assert $assert): void {
     $req = new Request('', Vector {}, '', $this->parser);
     $req = $req->withOptions(
-      Vector {shape('name' => 'arg1', 'value required' => false, 'description' => '')},
+      Vector {
+        shape(
+          'name' => 'arg1',
+          'value required' => false,
+          'description' => '',
+        ),
+      },
     );
 
     $assert->whenCalled(
@@ -117,9 +125,12 @@ class RequestTest {
 
   <<Test>>
   public function argumentDefault(Assert $assert): void {
-    $req = (new Request('', Vector {}, '', $this->parser))->withArguments(
-      Vector {shape('name' => 'arg', 'default' => 'value', 'description' => '')},
-    );
+    $req =
+      (new Request('', Vector {}, '', $this->parser))->withArguments(
+        Vector {
+          shape('name' => 'arg', 'default' => 'value', 'description' => ''),
+        },
+      );
 
     $assert->whenCalled(
       () ==> {
@@ -136,7 +147,10 @@ class RequestTest {
     $req =
       (new Request('', Vector {'val1', 'val 2'}, '', $this->parser))
         ->withArguments(
-          Vector {shape('name' => 'arg1', 'description' => ''), shape('name' => 'arg2', 'description' => '')},
+          Vector {
+            shape('name' => 'arg1', 'description' => ''),
+            shape('name' => 'arg2', 'description' => ''),
+          },
         );
 
     $assert->whenCalled(
@@ -155,10 +169,19 @@ class RequestTest {
     $req =
       (new Request('', Vector {'val1', '--opt', 'val 2'}, '', $this->parser))
         ->withArguments(
-          Vector {shape('name' => 'arg1', 'description' => ''), shape('name' => 'arg2', 'description' => '')},
+          Vector {
+            shape('name' => 'arg1', 'description' => ''),
+            shape('name' => 'arg2', 'description' => ''),
+          },
         )
         ->withOptions(
-          Vector {shape('name' => 'opt', 'value required' => false, 'description' => '')},
+          Vector {
+            shape(
+              'name' => 'opt',
+              'value required' => false,
+              'description' => '',
+            ),
+          },
         );
 
     $assert->whenCalled(
@@ -176,14 +199,23 @@ class RequestTest {
 
   <<Test>>
   public function argOptValueArgMissing(Assert $assert): void {
-    $req = (new Request(
-      '',
-      Vector {'val1', '--opt', 'val 2'},
-      '',
-      $this->parser,
-    ))->withArguments(
-      Vector {shape('name' => 'arg1', 'description' => ''), shape('name' => 'arg2', 'description' => '')},
-    )->withOptions(Vector {shape('name' => 'opt', 'value required' => true, 'description' => '')});
+    $req =
+      (new Request('', Vector {'val1', '--opt', 'val 2'}, '', $this->parser))
+        ->withArguments(
+          Vector {
+            shape('name' => 'arg1', 'description' => ''),
+            shape('name' => 'arg2', 'description' => ''),
+          },
+        )
+        ->withOptions(
+          Vector {
+            shape(
+              'name' => 'opt',
+              'value required' => true,
+              'description' => '',
+            ),
+          },
+        );
 
     $assert->whenCalled(
       () ==> {
@@ -207,27 +239,33 @@ class RequestTest {
 
   <<Test>>
   public function optionWithoutValue(Assert $assert): void {
-    $req = (new Request(
-      '',
-      Vector {
-        '-o',
-        'some value',
-        '-oo',
-        '-othero=stuff',
-        '--one="quoted stuff"',
-        '--one',
-        '--one',
-        'this value is here',
-        'this value is not',
-        '-one="value associated with the e"',
-      },
-      '',
-      $this->parser,
-    ))->withOptions(
-      Vector {
-        shape('name' => 'one', 'alias' => 'o', 'value required' => false, 'description' => ''),
-      },
-    );
+    $req =
+      (new Request(
+        '',
+        Vector {
+          '-o',
+          'some value',
+          '-oo',
+          '-othero=stuff',
+          '--one="quoted stuff"',
+          '--one',
+          '--one',
+          'this value is here',
+          'this value is not',
+          '-one="value associated with the e"',
+        },
+        '',
+        $this->parser,
+      ))->withOptions(
+        Vector {
+          shape(
+            'name' => 'one',
+            'alias' => 'o',
+            'value required' => false,
+            'description' => '',
+          ),
+        },
+      );
 
     $expectedValues = Vector {
       '',
@@ -256,28 +294,34 @@ class RequestTest {
 
   <<Test>>
   public function optionWithValue(Assert $assert): void {
-    $req = (new Request(
-      '',
-      Vector {
-        '-o',
-        'some value',
-        'not this value',
-        '-o=stuff',
-        'not this one',
-        '--one="quoted stuff"',
-        '--one',
-        'this value is here',
-        'this value is not',
-        '-stuffo',
-        'last value',
-      },
-      '',
-      $this->parser,
-    ))->withOptions(
-      Vector {
-        shape('name' => 'one', 'alias' => 'o', 'value required' => true, 'description' => ''),
-      },
-    );
+    $req =
+      (new Request(
+        '',
+        Vector {
+          '-o',
+          'some value',
+          'not this value',
+          '-o=stuff',
+          'not this one',
+          '--one="quoted stuff"',
+          '--one',
+          'this value is here',
+          'this value is not',
+          '-stuffo',
+          'last value',
+        },
+        '',
+        $this->parser,
+      ))->withOptions(
+        Vector {
+          shape(
+            'name' => 'one',
+            'alias' => 'o',
+            'value required' => true,
+            'description' => '',
+          ),
+        },
+      );
 
     $expectedValues = Vector {
       'some value',

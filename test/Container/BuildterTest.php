@@ -18,15 +18,16 @@ class BuilderTest {
 
   <<Test>>
   public function renderGetAndNew(Assert $assert): void {
-    $code = (new Builder(
-      Vector {
-        shape(
-          'name' => 'myService',
-          'return' => 'MyReturn',
-          'function' => 'function_name',
-        ),
-      },
-    ))->render();
+    $code =
+      (new Builder(
+        Vector {
+          shape(
+            'name' => 'myService',
+            'return' => 'MyReturn',
+            'function' => 'function_name',
+          ),
+        },
+      ))->render();
 
     $get = <<<'Hack'
 
@@ -48,15 +49,16 @@ Hack;
 
   <<Test>>
   public function renderFunction(Assert $assert): void {
-    $code = (new Builder(
-      Vector {
-        shape(
-          'name' => 'myService',
-          'return' => 'MyReturn',
-          'function' => 'function_name',
-        ),
-      },
-    ))->render();
+    $code =
+      (new Builder(
+        Vector {
+          shape(
+            'name' => 'myService',
+            'return' => 'MyReturn',
+            'function' => 'function_name',
+          ),
+        },
+      ))->render();
 
     $expected = <<<'Hack'
         return $this->__build__('MyService', fun('function_name'));
@@ -66,16 +68,17 @@ Hack;
 
   <<Test>>
   public function renderMethod(Assert $assert): void {
-    $code = (new Builder(
-      Vector {
-        shape(
-          'name' => 'myService',
-          'return' => 'MyReturn',
-          'class' => 'MyClass',
-          'method' => 'myMethod',
-        ),
-      },
-    ))->render();
+    $code =
+      (new Builder(
+        Vector {
+          shape(
+            'name' => 'myService',
+            'return' => 'MyReturn',
+            'class' => 'MyClass',
+            'method' => 'myMethod',
+          ),
+        },
+      ))->render();
 
     $expected = <<<'Hack'
         return $this->__build__('MyService', class_meth('MyClass', 'myMethod'));

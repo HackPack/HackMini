@@ -126,11 +126,12 @@ class Request {
   }
 
   private function parseInput(): void {
-    $results = $this->parser->parse(
-      $this->rawInput,
-      $this->argumentDefinitions,
-      $this->optionDefinitions,
-    );
+    $results =
+      $this->parser->parse(
+        $this->rawInput,
+        $this->argumentDefinitions,
+        $this->optionDefinitions,
+      );
     $this->input = $results['input'];
     $this->unnamedArguments = $results['unnamed arguments'];
   }

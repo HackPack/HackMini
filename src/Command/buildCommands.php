@@ -21,16 +21,16 @@ function buildCommandsHandler(
 }
 
 function buildCommands(Vector<\SplFileInfo> $fileList, string $outfile): int {
-    $functions = Vector {};
-    $classes = Vector {};
+  $functions = Vector {};
+  $classes = Vector {};
 
-    foreach ($fileList as $finfo) {
-      if ($finfo->isFile() && $finfo->isReadable()) {
-        $fileParser = FileParser::FromFile($finfo->getRealPath());
-        $functions->addAll($fileParser->getFunctions());
-        $classes->addAll($fileParser->getClasses());
-      }
+  foreach ($fileList as $finfo) {
+    if ($finfo->isFile() && $finfo->isReadable()) {
+      $fileParser = FileParser::FromFile($finfo->getRealPath());
+      $functions->addAll($fileParser->getFunctions());
+      $classes->addAll($fileParser->getClasses());
     }
+  }
 
   $middlewareParser = new MiddlewareParser($functions, $classes);
   if ($middlewareParser->failures()) {

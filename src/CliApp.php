@@ -2,7 +2,7 @@
 
 namespace HackPack\HackMini;
 
-require_once __DIR__ . '/Command/buildCommands.php';
+require_once __DIR__.'/Command/buildCommands.php';
 
 class CliApp {
   public function __construct(
@@ -33,7 +33,7 @@ class CliApp {
 
     if ($generateAutoload) {
       $composer = $this->findComposer();
-      system('hhvm ' . $composer . ' dumpautoload');
+      system('hhvm '.$composer.' dumpautoload');
     }
   }
 
@@ -98,14 +98,14 @@ function globalCliMiddleware(
   return Vector {};
 }
 Hack;
-    $outfile = $this->request->projectRoot() . '/middleware.php';
+    $outfile = $this->request->projectRoot().'/middleware.php';
     $bytesWritten = file_put_contents($outfile, $code);
-    if($bytesWritten === false) {
+    if ($bytesWritten === false) {
       $this->interaction->showLine('Unable to write global middleware file.');
       exit(1);
     }
 
-    require_once($outfile);
+    require_once ($outfile);
   }
 
   private function buildFactoryContainer(): void {
@@ -123,12 +123,12 @@ Hack;
 
   private function findComposer(): string {
     $paths = [
-      $this->request->projectRoot() . '/composer.phar',
+      $this->request->projectRoot().'/composer.phar',
       exec('which composer'),
     ];
 
-    foreach($paths as $path) {
-      if(is_file($path)) {
+    foreach ($paths as $path) {
+      if (is_file($path)) {
         return $path;
       }
     }

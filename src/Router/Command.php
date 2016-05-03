@@ -34,9 +34,9 @@ class Command {
     $this->stack
       ->addAll($commandDefinition['middleware']->map($m ==> $m($this->c)));
 
-    $req = $req->withArguments($commandDefinition['arguments'])->withOptions(
-      $commandDefinition['options'],
-    );
+    $req =
+      $req->withArguments($commandDefinition['arguments'])
+        ->withOptions($commandDefinition['options']);
 
     return $this->runStack($commandDefinition['handler'], $req, $interaction);
   }

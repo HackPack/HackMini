@@ -110,7 +110,11 @@ Hack;
           'function' => 'f',
           'arguments' => Vector {
             shape('name' => 'one', 'description' => ''),
-            shape('name' => 'two', 'default' => 'stuff', 'description' => ''),
+            shape(
+              'name' => 'two',
+              'default' => 'stuff',
+              'description' => '',
+            ),
           },
           'options' => Vector {},
         ),
