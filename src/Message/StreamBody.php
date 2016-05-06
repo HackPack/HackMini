@@ -58,22 +58,6 @@ class StreamBody implements Stream {
   }
 
   /**
-   * Separates any underlying resources from the stream.
-   *
-   * After the stream has been detached, the stream is in an unusable state.
-   *
-   * @return resource|null Underlying PHP stream, if any
-   */
-  public function detach(): ?resource {
-    if (is_resource($this->stream)) {
-      $s = $this->stream;
-      $this->stream = null;
-      return $this->stream;
-    }
-    return null;
-  }
-
-  /**
    * Get the size of the stream if known.
    *
    * @return int|null Returns the size in bytes if known, or null if unknown.
@@ -135,7 +119,7 @@ class StreamBody implements Stream {
    *     SEEK_END: Set position to end-of-stream plus offset.
    * @throws \RuntimeException on failure.
    */
-  public function seek(int $offset, int $whence = SEEK_SET): void {
+  public function seek(int $offset, Whence $whence = Whence::SET): void {
     if ($offset === null) {
       throw new \RuntimeException('Null offset');
     }
@@ -279,35 +263,6 @@ class StreamBody implements Stream {
     return $result;
   }
 
-  /**
-   * Get stream metadata as an associative array or retrieve a specific key.
-   *
-   * The keys returned are identical to the keys returned from PHP's
-   * stream_get_meta_data() function.
-   *
-   * @link http://php.net/manual/en/function.stream-get-meta-data.php
-   * @param string $key Specific metadata to retrieve.
-   * @return array|mixed|null Returns an associative array if no key is
-   *     provided. Returns a specific key value if a key is provided and the
-   *     value is found, or null if the key is not found.
-   */
-  public function getMetadata(?string $key = null): mixed {
-    if (!is_resource($this->stream)) {
-      return null;
-    }
-    $data = stream_get_meta_data($this->stream);
-
-    if ($key === null) {
-      return $data;
-    }
-
-    if (array_key_exists($key, $data)) {
-      return $data[$key];
-    }
-
-    return null;
-  }
-
   private function setReadWrite(string $mode): void {
     if (substr($mode, -1) === '+') {
       $this->readable = true;
@@ -326,5 +281,9 @@ class StreamBody implements Stream {
       return;
     }
 
+  }
+
+  public function __destruct() {
+    $this->close();
   }
 }

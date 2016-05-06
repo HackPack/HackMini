@@ -2,6 +2,10 @@
 
 namespace HackPack\HackMini\CodeGenerator;
 
+use FactoryContainer;
+use HackPack\HackMini\Command\Request;
+use HackPack\HackMini\Command\UserInteraction;
+
 use HackPack\HackMini\Util;
 
 <<
@@ -10,9 +14,9 @@ Arguments('name'),
 Options('p|path=', 'c|class')
 >>
 function generateCommandHandler(
-  \FactoryContainer $c,
-  \HackPack\HackMini\Command\Request $req,
-  \HackPack\HackMini\Command\UserInteraction $interaction,
+  FactoryContainer $c,
+  Request $req,
+  UserInteraction $interaction,
 ): int {
   $name = $req->atFirst('name');
   $path = $req->getFirst('path');
@@ -70,12 +74,18 @@ function functionCommandHandler(string $name, string $namespace): string {
 
   return<<<Hack
 <?hh // strict
+
 {$namespace}
+
+use FactoryContainer;
+use HackPack\\HackMini\\Command\\Request;
+use HackPack\\HackMini\\Command\\UserInteraction;
+
 <<Command('{$name}')>>
 function {$name}Handler(
-  \\FactoryContainer \$c,
-  \\HackPack\\HackMini\\Command\\Request \$req,
-  \\HackPack\\HackMini\\Command\\UserInteraction \$interaction,
+  FactoryContainer \$c,
+  Request \$req,
+  UserInteraction \$interaction,
 ): int {
   // Your code here
   \$interaction->showLine('Not implemented');
@@ -90,13 +100,18 @@ function methodCommandHandler(string $name, string $namespace): string {
 
   return<<<Hack
 <?hh // strict
+
 {$namespace}
+
+use FactoryContainer;
+use HackPack\\HackMini\\Command\\Request;
+use HackPack\\HackMini\\Command\\UserInteraction;
 class {$ucName} {
-  <<Command('{$name}') /*, Arguments(), Options()*/>>
+  <<Command('{$name}')>>
   public static function handle(
-    \\FactoryContainer \$c,
-    \\HackPack\\HackMini\\Command\\Request \$req,
-    \\HackPack\\HackMini\\Command\\UserInteraction \$interaction,
+    FactoryContainer \$c,
+    Request \$req,
+    UserInteraction \$interaction,
   ): int {
     // Your code here
     \$interaction->showLine('Not implemented');

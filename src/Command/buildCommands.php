@@ -7,16 +7,17 @@ use HackPack\HackMini\Command\UserInteraction;
 use HackPack\HackMini\Middleware\DefinitionParser as MiddlewareParser;
 use FredEmmott\DefinitionFinder\FileParser;
 use HackPack\HackMini\Util;
+use FactoryContainer;
 
 <<Command('commands:build'), Options('i|include-path=', 'e|exclude-path=')>>
 function buildCommandsHandler(
-  \FactoryContainer $c,
-  \HackPack\HackMini\Command\Request $req,
-  \HackPack\HackMini\Command\UserInteraction $rsp,
+  FactoryContainer $c,
+  Request $req,
+  UserInteraction $interaction,
 ): int {
   $fileList =
     Util\listPhpFiles($req->get('include-path'), $req->get('exclude-path'));
-  $rsp->showLine('Building commands');
+  $interaction->showLine('Building commands');
   return buildCommands($fileList, $req->projectRoot().'/build/commands.php');
 }
 

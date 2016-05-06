@@ -9,7 +9,7 @@ use HackPack\HackMini\Contract\Message\Stream;
  * SEEK_CUR: Set position to current location plus offset
  * SEEK_END: Set position to end-of-stream plus offset.
  */
-enum SeekWhence : int as int {
+enum Whence : int as int {
   SET = SEEK_SET;
   CUR = SEEK_CUR;
   END = SEEK_END;
@@ -21,23 +21,9 @@ class StringBody implements Stream {
 
   public function __construct(private string $message) {}
 
-  /**
-   * Reads all data from the stream into a string, from the beginning to end.
-   *
-   * This method MUST attempt to seek to the beginning of the stream before
-   * reading data and read the stream until the end is reached.
-   *
-   * Warning: This could attempt to load a large amount of data into memory.
-   *
-   * This method MUST NOT raise an exception in order to conform with PHP's
-   * string casting operations.
-   *
-   * @see http://php.net/manual/en/language.oop5.magic.php#object.tostring
-   * @return string
-   */
   public function __toString(): string {
-    $this->position = strlen($this->message) - 1;
-    return $this->message;
+    $this->rewind();
+    return $this->getContents();
   }
 
   /**
@@ -46,17 +32,6 @@ class StringBody implements Stream {
    * @return void
    */
   public function close(): void {}
-
-  /**
-   * Separates any underlying resources from the stream.
-   *
-   * After the stream has been detached, the stream is in an unusable state.
-   *
-   * @return resource|null Underlying PHP stream, if any
-   */
-  public function detach(): ?resource {
-    return null;
-  }
 
   /**
    * Get the size of the stream if known.
@@ -107,22 +82,17 @@ class StringBody implements Stream {
    *     SEEK_END: Set position to end-of-stream plus offset.
    * @throws \RuntimeException on failure.
    */
-  public function seek(int $offset, int $whence = SEEK_SET): void {
-    invariant(is_int($offset), 'Non int passed to seek.');
-    $whence = SeekWhence::coerce($whence);
-    if ($whence === null) {
-      throw new \RuntimeException('Invalid value for $whence');
-    }
-
+  public function seek(int $offset, Whence $whence = Whence::SET): void {
     switch ($whence) {
-      case SeekWhence::SET:
+      case Whence::SET:
         $this->position = $offset;
-        break;
-      case SeekWhence::CUR:
+        return;
+      case Whence::CUR:
         $this->position += $offset;
-        break;
-      case SeekWhence::END:
+        return;
+      case Whence::END:
         $this->position = strlen($this->message) + $offset;
+        return;
     }
   }
 
@@ -158,10 +128,6 @@ class StringBody implements Stream {
    */
   public function write(string $string): int {
 
-    if ($string === null) {
-      $string = '';
-    }
-
     $written = strlen($string);
 
     $before = substr($this->message, 0, $this->position);
@@ -193,10 +159,10 @@ class StringBody implements Stream {
    * @throws \RuntimeException if an error occurs.
    */
   public function read(int $length): string {
-    if ($length === null) {
-      throw new \RuntimeException('Cannot read null length.');
-    }
     $result = substr($this->message, $this->position, $length);
+    if ($result === false) {
+      return '';
+    }
     $this->position += strlen($result);
     return $result;
   }
@@ -209,22 +175,11 @@ class StringBody implements Stream {
    *     reading.
    */
   public function getContents(): string {
-    return substr($this->message, $this->position);
-  }
-
-  /**
-   * Get stream metadata as an associative array or retrieve a specific key.
-   *
-   * The keys returned are identical to the keys returned from PHP's
-   * stream_get_meta_data() function.
-   *
-   * @link http://php.net/manual/en/function.stream-get-meta-data.php
-   * @param string $key Specific metadata to retrieve.
-   * @return array|mixed|null Returns an associative array if no key is
-   *     provided. Returns a specific key value if a key is provided and the
-   *     value is found, or null if the key is not found.
-   */
-  public function getMetadata(?string $key = null): mixed {
-    return null;
+    $result = substr($this->message, $this->position);
+    if ($result === false) {
+      return '';
+    }
+    $this->position += strlen($result);
+    return $result;
   }
 }

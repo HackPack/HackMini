@@ -7,13 +7,14 @@ use HackPack\HackMini\Command\UserInteraction;
 use HackPack\HackMini\Middleware\DefinitionParser as MiddlewareParser;
 use HackPack\HackMini\Routes\Builder;
 use HackPack\HackMini\Util;
+use FactoryContainer;
 use FredEmmott\DefinitionFinder\FileParser;
 
 <<Command('routes:build'), Options('i|include-path=', 'e|exclude-path=')>>
 function buildRoutesHandler(
-  \FactoryContainer $c,
-  \HackPack\HackMini\Command\Request $req,
-  \HackPack\HackMini\Command\UserInteraction $interaction,
+  FactoryContainer $c,
+  Request $req,
+  UserInteraction $interaction,
 ): int {
   $outfile = $req->projectRoot().'/build/routes.php';
   $fileList =
