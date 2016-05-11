@@ -11,33 +11,27 @@ final class Request {
 
   private Vector<string> $pathGroups = Vector {};
   private Map<string, mixed> $parsedBody = Map {};
-  private string $target;
 
   public function __construct(
     private HttpProtocolVersion $protocolVersion,
-    private string $method,
+    private RestMethod $method,
     private Uri $uri,
-    private Map<string, Vector<string>> $headerValues,
-    private Map<string, string> $headerKeys,
+    KeyedTraversable<string, string> $headers,
     Stream $body,
   ) {
     $this->body = $body;
-    $this->target = $uri->getPath().$uri->getQueryWithQuestion();
+    $this->headerKeys = Map {};
+    $this->headerValues = Map {};
+    foreach ($headers as $name => $value) {
+      $this->addHeaderList($name, Vector {$value});
+    }
   }
 
-  public function getRestMethod(): RestMethod {
-    $method = RestMethod::coerce($this->method);
-    return $method === null ? RestMethod::Unknown : $method;
-  }
-
-  public function getMethod(): string {
+  public function getMethod(): RestMethod {
     return $this->method;
   }
 
-  public function withMethod(string $verb): this {
-    if ($verb === null) {
-      $verb = '';
-    }
+  public function withMethod(RestMethod $verb): this {
     $new = clone $this;
     $new->method = $verb;
     return $new;
@@ -59,6 +53,7 @@ final class Request {
     return $validator->at($raw);
   }
 
+
   public function pathGroup(int $offset): string {
     $group = $this->pathGroups->get($offset);
     if ($group === null) {
@@ -67,14 +62,14 @@ final class Request {
     return $group;
   }
 
-  public function setPathGroups(Traversable<string> $groups): this {
+  public function pathGroups(): \ConstVector<string> {
+    return $this->pathGroups;
+  }
+  
+  public function withPathGroups(Traversable<string> $groups): this {
     $new = clone $this;
     $new->pathGroups = new Vector($groups);
     return $new;
-  }
-
-  public function getRequestTarget(): string {
-    return $this->target;
   }
 
   public function getUri(): Uri {

@@ -1,4 +1,4 @@
 {
-  "roots": [""],
+  "roots": ["bin/", "build/", "src/", "vendor/", "test/"],
   "includeVendor": true
 }

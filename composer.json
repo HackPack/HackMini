@@ -14,6 +14,11 @@
       "HackPack\\HackMini\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "HackPack\\HackMini\\Test\\": "test/"
+    }
+  },
   "license": "MIT",
   "authors": [
     {
@@ -27,7 +32,7 @@
     "hackpack/hackunit": "^0.7.1"
   },
   "scripts": {
-    "test": "vendor/bin/hackunit test",
+    "test": "hhvm test/runner.php",
     "format": "hh_format src; hh_format test; hh_format -i bin/hackmini"
   },
   "archive": {

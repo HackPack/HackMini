@@ -16,23 +16,18 @@ function buildRequestFromGlobals(
     $server->containsKey('REQUEST_METHOD')
       ? $server->at('REQUEST_METHOD')
       : '';
+  $method = RestMethod::coerce($method);
+  if ($method === null) {
+    $method = RestMethod::Unknown;
+  }
 
   $uri = $server->containsKey('SCRIPT_URI') ? $server->at('SCRIPT_URI') : '/';
-
-  $headerKeys = Map {};
-  $headerValues = Map {};
-  foreach (getallheaders() as $key => $line) {
-    $lowerKey = strtolower($key);
-    $headerKeys->set($lowerKey, $key);
-    $headerValues->set($lowerKey, new Vector(explode(',', $line)));
-  }
 
   return new Request(
     $protocol,
     $method,
     Uri::fromString($uri),
-    $headerValues,
-    $headerKeys,
+    new Map(getallheaders()),
     $c->getServerBody(),
   );
 }

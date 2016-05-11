@@ -135,25 +135,25 @@ trait Message {
     return implode(',', $this->getHeader($name));
   }
 
-  /**
-   * Return an instance with the provided value replacing the specified header.
-   *
-   * While header names are case-insensitive, the casing of the header will
-   * be preserved by this function, and returned from getHeaders().
-   *
-   * This method MUST be implemented in such a way as to retain the
-   * immutability of the message, and MUST return an instance that has the
-   * new and/or updated header and value.
-   *
-   * @param string $name Case-insensitive header field name.
-   * @param string|string[] $value Header value(s).
-   * @return self
-   * @throws \InvalidArgumentException for invalid header names or values.
-   */
-  public function withHeader(string $name, mixed $value): this {
-    if ($name === null) {
-      throw new \InvalidArgumentException('Header names may not be null.');
-    }
+  public function withHeader(string $name, string $value): this {
+    $new = clone $this;
+    $new->setHeaderList($name, Vector {$value});
+    return $new;
+  }
+
+  public function withHeaderList(
+    string $name,
+    \ConstVector<string> $values,
+  ): this {
+    $new = clone $this;
+    $new->setHeaderList($name, $values);
+    return $new;
+  }
+  private function setHeaderList(
+    string $name,
+    \ConstVector<string> $values,
+  ): void {
+
     $lowerName = strtolower($name);
     if (strpos(':', $lowerName) !== -1) {
       throw new \InvalidArgumentException(
@@ -161,47 +161,38 @@ trait Message {
       );
     }
 
-    $new = clone $this;
-    $new->headerKeys->set($lowerName, $name);
-    $new->headerValues->set($lowerName, $this->stringifyValues($value));
+    $this->headerKeys->set($lowerName, $name);
+    $this->headerValues->set($lowerName, $values->toVector());
+  }
 
+  public function withAddedHeader(string $name, string $value): this {
+    $new = clone $this;
+    $new->addHeaderList($name, Vector {$value});
     return $new;
   }
 
-  /**
-   * Return an instance with the specified header appended with the given value.
-   *
-   * Existing values for the specified header will be maintained. The new
-   * value(s) will be appended to the existing list. If the header did not
-   * exist previously, it will be added.
-   *
-   * This method MUST be implemented in such a way as to retain the
-   * immutability of the message, and MUST return an instance that has the
-   * new header and/or value.
-   *
-   * @param string $name Case-insensitive header field name to add.
-   * @param string|string[] $value Header value(s).
-   * @return self
-   * @throws \InvalidArgumentException for invalid header names or values.
-   */
-  public function withAddedHeader(string $name, mixed $value): this {
-    if ($name === null) {
-      throw new \InvalidArgumentException('Header names may not be null.');
-    }
-
-    $lowerName = strtolower($name);
+  public function withAddedHeaderList(
+    string $name,
+    \ConstVector<string> $values,
+  ): this {
     $new = clone $this;
+    $new->addHeaderList($name, $values);
+    return $new;
+  }
 
-    $currentValues = $new->headerValues->get($lowerName);
+  private function addHeaderList(
+    string $name,
+    \ConstVector<string> $values,
+  ): void {
+    $lowerName = strtolower($name);
+    $currentValues = $this->headerValues->get($lowerName);
     if ($currentValues === null) {
       $currentValues = Vector {};
-      $new->headerValues->set($lowerName, $currentValues);
-      $new->headerKeys->set($lowerName, $name);
+      $this->headerValues->set($lowerName, $currentValues);
+      $this->headerKeys->set($lowerName, $name);
     }
 
-    $currentValues->addAll($this->stringifyValues($value));
-
-    return $new;
+    $currentValues->addAll($values);
   }
 
   /**

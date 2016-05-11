@@ -7,7 +7,11 @@ final class Response {
   use Message;
 
   <<Provides('ServerResponse')>>
-  public static function factory(\FactoryContainer $c): this {
+  public static function provider(\FactoryContainer $c): this {
+    return self::factory();
+  }
+
+  public static function factory(): this {
     return new static(
       HttpProtocolVersion::v11,
       'OK',
