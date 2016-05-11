@@ -21,7 +21,7 @@ function buildRequestFromGlobals(
     $method = RestMethod::Unknown;
   }
 
-  $uri = $server->containsKey('SCRIPT_URI') ? $server->at('SCRIPT_URI') : '/';
+  $uri = $server->containsKey('REQUEST_URI') ? $server->at('REQUEST_URI') : '/';
 
   return new Request(
     $protocol,
