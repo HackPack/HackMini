@@ -43,6 +43,8 @@ final class WebApp {
       header("$name: $value");
     }
 
+    http_response_code($response->getStatusCode());
+
     // TODO: actually stream this
     echo (string)$response->getBody();
   }

@@ -51,6 +51,10 @@ final class Response {
     return $this->withStatus(404);
   }
 
+  public function forward(string $uri): this {
+    return $this->withHeader('Location', $uri)->withStatus(303);
+  }
+
   public function getStatusCode(): int {
     return $this->status;
   }
