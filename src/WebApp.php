@@ -4,6 +4,7 @@ namespace HackPack\HackMini;
 
 use HackPack\HackMini\Message\Request;
 use HackPack\HackMini\Message\Response;
+use HackPack\HackMini\Message\Cookie;
 use HackPack\HackMini\Contract\Middleware;
 
 final class WebApp {
@@ -24,6 +25,49 @@ final class WebApp {
 
   public function run(): void {
     $response = $this->router->handle($this->req, $this->rsp);
-    echo (string) $response->getBody();
+
+    foreach ($response->getCookies() as $cookie) {
+      $c = $this->normalizeCookie($cookie);
+      setcookie(
+        $c['name'],
+        $c['payload'],
+        $c['expires'],
+        $c['path'],
+        $c['domain'],
+        $c['secure'],
+        $c['http only'],
+      );
+    }
+
+    foreach($response->getHeaders() as $name => $value) {
+      header("$name: $value");
+    }
+
+    // TODO: actually stream this
+    echo (string)$response->getBody();
   }
+
+  private function normalizeCookie(
+    Cookie $cookie,
+  ): shape(
+    'name' => string,
+    'payload' => string,
+    'expires' => int,
+    'path' => string,
+    'domain' => string,
+    'secure' => bool,
+    'http only' => bool,
+  ) {
+    $expires = Shapes::idx($cookie, 'expires', null);
+    return shape(
+      'name' => $cookie['name'],
+      'payload' => $cookie['payload'],
+      'expires' => $expires === null ? 0 : $expires->getTimestamp(),
+      'path' => Shapes::idx($cookie, 'path', ''),
+      'domain' => Shapes::idx($cookie, 'domain', ''),
+      'secure' => Shapes::idx($cookie, 'secure', true),
+      'http only' => Shapes::idx($cookie, 'http only', true),
+    );
+  }
+
 }

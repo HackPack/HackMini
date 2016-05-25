@@ -28,8 +28,8 @@ final class Response {
     private string $reason,
     private int $status,
     private Uri $uri,
-    private Map<string, Vector<string>> $headerValues,
-    private Map<string, string> $headerKeys,
+    private Map<string, string> $headers,
+    private Map<string, Cookie> $cookies,
     private Stream $body,
   ) {}
 

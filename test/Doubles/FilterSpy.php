@@ -5,9 +5,9 @@ namespace HackPack\HackMini\Test\Doubles;
 use HackPack\HackMini\Filter\Filter;
 
 class FilterSpy<Tval> implements Filter<Tval> {
-    public (function(string): string) $description;
-    public (function(mixed): bool) $filter;
-    public (function(mixed): Tval) $transform;
+  public (function(string): string) $description;
+  public (function(mixed): bool) $filter;
+  public (function(mixed): Tval) $transform;
 
   public function __construct(
     (function(string): string) $description,

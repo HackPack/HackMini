@@ -26,6 +26,7 @@ class WebTest {
       RestMethod::Get,
       Uri::fromString($path),
       [], // headers
+      [], // cookies
       new StringBody(''),
     );
   }

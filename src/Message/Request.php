@@ -17,13 +17,16 @@ final class Request {
     private RestMethod $method,
     private Uri $uri,
     KeyedTraversable<string, string> $headers,
-    Stream $body,
+    KeyedTraversable<string, string> $cookies,
+    private Stream $body,
   ) {
-    $this->body = $body;
-    $this->headerKeys = Map {};
-    $this->headerValues = Map {};
-    foreach ($headers as $name => $value) {
-      $this->addHeaderList($name, Vector {$value});
+    $this->headers = new Map($headers);
+    $this->cookies = Map {};
+    foreach ($cookies as $name => $value) {
+      $this->cookies->set(
+        mb_strtolower($name),
+        shape('name' => mb_strtolower($name), 'payload' => $value),
+      );
     }
   }
 
@@ -82,7 +85,7 @@ final class Request {
     $new = clone $this;
     $new->uri = $uri;
 
-    $currentHeader = $new->getHeaderLine('Host');
+    $currentHeader = $new->getHeader('Host');
     if (// Don't touch the host header
         $preserveHost &&
         // Unless we don't have one

@@ -29,6 +29,7 @@ function buildRequestFromGlobals(
     $method,
     Uri::fromString($uri),
     new Map(getallheaders()),
+    $_COOKIE,
     $c->getServerBody(),
   );
 }

@@ -42,7 +42,10 @@ class ListFilterTest {
     $assert->bool($filter->validate($data))->is(false);
     $result = $filter->transform($data);
     $assert->mixed($result)->isTypeOf(Vector::class);
-    invariant($result instanceof Vector, 'Tell the type checker we know its a vector.');
+    invariant(
+      $result instanceof Vector,
+      'Tell the type checker we know its a vector.',
+    );
     $assert->container($result)->isEmpty();
     $assert->container($this->filterCalls)->isEmpty();
     $assert->container($this->transformCalls)->isEmpty();
@@ -61,7 +64,7 @@ class ListFilterTest {
   public function elementFilterResultIsRespected(Assert $assert): void {
     $data = ['a', 'b', 'c'];
     $this->spy->filter = $raw ==> {
-      if($this->filterCalls->count() > 0) {
+      if ($this->filterCalls->count() > 0) {
         return false;
       }
       $this->filterCalls->add($raw);
@@ -84,7 +87,8 @@ class ListFilterTest {
 
     $filter = new ListFilter($this->spy);
 
-    $assert->string($filter->description('field name'))->contains($elementDescription);
+    $assert->string($filter->description('field name'))
+      ->contains($elementDescription);
     $assert->int($this->nameCalls->count())->eq(1);
     $assert->string($this->nameCalls->at(0))->contains('field name');
   }
