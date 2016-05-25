@@ -66,13 +66,10 @@ class WebTest {
   public function regexPath(Assert $assert): void {
 
     $handler = ($c, $req, $rsp) ==> {
-      $assert->container($req->pathGroups())->containsOnly([
-        '/abc/def',
-        'abc',
-        'def'
-        ]);
-        $this->handlerRunCount++;
-        return $rsp;
+      $assert->container($req->pathGroups())
+        ->containsOnly(['/abc/def', 'abc', 'def']);
+      $this->handlerRunCount++;
+      return $rsp;
     };
 
     $router = new Web(
@@ -90,7 +87,10 @@ class WebTest {
 
     $assert->whenCalled(
       () ==> {
-        $router->handle($this->buildRequest('/abc/def'), Response::factory());
+        $router->handle(
+          $this->buildRequest('/abc/def'),
+          Response::factory(),
+        );
       },
     )->willNotThrow();
     $assert->int($this->handlerRunCount)->eq(1);
@@ -273,34 +273,44 @@ class WebTest {
 
   <<Test>>
   public function middlewareAreRunInOrder(Assert $assert): void {
-    $middlewareRun = Set{};
-      $g1 = new MiddlewareSpy(($req, $rsp, $next) ==> {
+    $middlewareRun = Set {};
+    $g1 = new MiddlewareSpy(
+      ($req, $rsp, $next) ==> {
         $assert->container($middlewareRun)->isEmpty();
         $middlewareRun->add('g1');
         return $next($req, $rsp);
-      });
-      $g2 = new MiddlewareSpy(($req, $rsp, $next) ==> {
+      },
+    );
+    $g2 = new MiddlewareSpy(
+      ($req, $rsp, $next) ==> {
         $assert->container($middlewareRun)->containsOnly(['g1']);
         $middlewareRun->add('g2');
         return $next($req, $rsp);
-      });
-      $l1 = new MiddlewareSpy(($req, $rsp, $next) ==> {
+      },
+    );
+    $l1 = new MiddlewareSpy(
+      ($req, $rsp, $next) ==> {
         $assert->container($middlewareRun)->containsOnly(['g1', 'g2']);
         $middlewareRun->add('l1');
         return $next($req, $rsp);
-      });
-      $l2 = new MiddlewareSpy(($req, $rsp, $next) ==> {
-        $assert->container($middlewareRun)->containsOnly(['g1', 'g2', 'l1']);
-        $middlewareRun->add('l2');
-        return $next($req, $rsp);
-      });
+      },
+    );
+    $l2 =
+      new MiddlewareSpy(
+        ($req, $rsp, $next) ==> {
+          $assert->container($middlewareRun)
+            ->containsOnly(['g1', 'g2', 'l1']);
+          $middlewareRun->add('l2');
+          return $next($req, $rsp);
+        },
+      );
 
     $router = new Web(
-      Vector{$g1, $g2},
+      Vector {$g1, $g2},
       Map {
         RestMethod::Get => Map {
           '/' => shape(
-            'middleware' => Vector{($c) ==> $l1, ($c) ==> $l2},
+            'middleware' => Vector {($c) ==> $l1, ($c) ==> $l2},
             'handler' => $this->buildHandler(),
           ),
         },
@@ -322,26 +332,28 @@ class WebTest {
 
   <<Test>>
   public function middlewareMaySkip(Assert $assert): void {
-    $middlewareRun = Set{};
-      $m1 = new MiddlewareSpy(($req, $rsp, $next) ==> {
+    $middlewareRun = Set {};
+    $m1 = new MiddlewareSpy(
+      ($req, $rsp, $next) ==> {
         $assert->container($middlewareRun)->isEmpty();
         $middlewareRun->add(1);
         return $next($req, $rsp);
-      });
-      $m2 = new MiddlewareSpy(($req, $rsp, $next) ==> {
+      },
+    );
+    $m2 = new MiddlewareSpy(
+      ($req, $rsp, $next) ==> {
         $assert->container($middlewareRun)->containsOnly([1]);
         $middlewareRun->add(2);
         return $rsp;
-      });
-      $m3 = new MiddlewareSpy(($req, $rsp, $next) ==> {
-        throw new \Exception('M3 should not run');
-      });
-
-    $router = new Web(
-      Vector{$m1, $m2, $m3},
-      Map {},
-      new FactoryContainer(),
+      },
     );
+    $m3 = new MiddlewareSpy(
+      ($req, $rsp, $next) ==> {
+        throw new \Exception('M3 should not run');
+      },
+    );
+
+    $router = new Web(Vector {$m1, $m2, $m3}, Map {}, new FactoryContainer());
 
     $assert->whenCalled(
       () ==> {

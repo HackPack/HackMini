@@ -2,7 +2,7 @@
 
 namespace HackPack\HackMini\Message;
 
-use HackPack\HackMini\Validator\Validator;
+use HackPack\HackMini\Filter\Filter;
 use HackPack\HackMini\Contract\Message\Stream;
 use FactoryContainer;
 
@@ -37,22 +37,24 @@ final class Request {
     return $new;
   }
 
-  public function get<Tval>(string $name, Validator<Tval> $validator): ?Tval {
+  public function get<Tval>(string $name, Filter<Tval> $validator): ?Tval {
     $raw = $this->parsedBody->get($name);
     if ($raw === null) {
       return null;
     }
-    return $validator->get($raw);
+    return $validator->validate($raw) ? $validator->transform($raw) : null;
   }
 
-  public function at<Tval>(string $name, Validator<Tval> $validator): Tval {
-    $raw = $this->parsedBody->get($name);
-    if ($raw === null) {
+  public function at<Tval>(string $name, Filter<Tval> $validator): Tval {
+    if (!$this->parsedBody->containsKey($name)) {
       throw MissingInput::build($name);
     }
-    return $validator->at($raw);
+    $value = $this->get($name, $validator);
+    if ($value === null) {
+      throw new InvalidInput($validator->description($name));
+    }
+    return $value;
   }
-
 
   public function pathGroup(int $offset): string {
     $group = $this->pathGroups->get($offset);
@@ -65,7 +67,7 @@ final class Request {
   public function pathGroups(): \ConstVector<string> {
     return $this->pathGroups;
   }
-  
+
   public function withPathGroups(Traversable<string> $groups): this {
     $new = clone $this;
     $new->pathGroups = new Vector($groups);

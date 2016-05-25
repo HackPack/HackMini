@@ -4,16 +4,8 @@ namespace HackPack\HackMini\Message;
 
 use HackPack\HackMini\Validator\Validator;
 
-final class MissingInput extends \Exception {
-  public static function build(string $name): this {
-    return new static($name.' is missing', $name);
-  }
-
-  public function __construct(string $message, private string $name) {
+final class InvalidInput extends \Exception {
+  public function __construct(string $message) {
     parent::__construct($message);
-  }
-
-  public function paramName(): string {
-    return $this->name;
   }
 }
