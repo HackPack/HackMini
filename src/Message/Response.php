@@ -55,6 +55,10 @@ final class Response {
     return $this->withHeader('Location', $uri)->withStatus(303);
   }
 
+  public function forbidden(): this {
+    return $this->withStatus(403);
+  }
+
   public function getStatusCode(): int {
     return $this->status;
   }
