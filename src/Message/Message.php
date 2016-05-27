@@ -85,9 +85,8 @@ trait Message {
     return $new;
   }
 
-  public function getCookie(string $name): ?string {
-    $cookie = $this->cookies->get(mb_strtolower($name));
-    return $cookie === null ? null : $cookie['name'];
+  public function getCookie(string $name): ?Cookie {
+    return $this->cookies->get(mb_strtolower($name));
   }
 
   public function getCookies(): \ConstVector<Cookie> {
