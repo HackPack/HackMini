@@ -40,6 +40,12 @@ final class Request {
     return $new;
   }
 
+  public function withParsedBody(KeyedTraversable<string, mixed> $data): this {
+    $new = clone $this;
+    $new->parsedBody = new Map($data);
+    return $new;
+  }
+
   public function get<Tval>(string $name, Filter<Tval> $validator): ?Tval {
     $raw = $this->parsedBody->get($name);
     if ($raw === null) {
