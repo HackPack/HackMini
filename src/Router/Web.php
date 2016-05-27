@@ -16,7 +16,7 @@ final class Web {
 
   <<Provides('WebRouter')>>
   public static function factory(\FactoryContainer $c): this {
-    return new static(globalWebMiddleware(), routes(), $c);
+    return new static(\globalWebMiddleware($c), routes(), $c);
   }
 
   public function __construct(

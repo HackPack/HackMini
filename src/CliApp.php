@@ -38,10 +38,11 @@ class CliApp {
   }
 
   public function run(): int {
+    $c = new \FactoryContainer();
     $router = new Router\Command(
-      new \FactoryContainer(),
+      $c,
       \commands(),
-      \globalCliMiddleware(),
+      \globalCliMiddleware($c),
     );
 
     try {
@@ -89,11 +90,13 @@ use HackPack\HackMini\Message\Request as WebRequest;
 use HackPack\HackMini\Message\Response;
 
 function globalWebMiddleware(
+  FactoryContainer \$c,
 ): Vector<Middleware<WebRequest, Response, Response>> {
   return Vector {};
 }
 
 function globalCliMiddleware(
+  FactoryContainer \$c,
 ): Vector<Middleware<CliRequest, UserInteraction, int>> {
   return Vector {};
 }
