@@ -21,13 +21,16 @@ function buildRequestFromGlobals(
     $method = RestMethod::Unknown;
   }
 
-  $uri =
+  $path =
     $server->containsKey('REQUEST_URI') ? $server->at('REQUEST_URI') : '/';
+  $scriptUri = $server->containsKey('SCRIPT_URI') ? $server->at('SCRIPT_URI'): '';
+
+  $uri = Uri::fromString($scriptUri)->withPath($path);
 
   return new Request(
     $protocol,
     $method,
-    Uri::fromString($uri),
+    $uri,
     new Map(getallheaders()),
     $_COOKIE,
     $c->getServerBody(),
