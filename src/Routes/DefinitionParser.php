@@ -70,7 +70,6 @@ final class DefinitionParser {
           list($verb, $pattern) = $this->checkRoute($routeAttribute);
 
           $this->checkParameters($function->getParameters());
-          $this->checkReturn($function->getReturnType());
           $middleware = $this->extractMiddleware(
             $function->getAttributes()->get('UseMiddleware'),
           );
@@ -114,7 +113,6 @@ final class DefinitionParser {
       list($verb, $pattern) = $this->checkRoute($routeAttribute);
 
       $this->checkParameters($method->getParameters());
-      $this->checkReturn($method->getReturnType());
 
       if (!$method->isStatic()) {
         throw new \UnexpectedValueException(
@@ -205,16 +203,12 @@ final class DefinitionParser {
         },
       );
 
-    if ($requiredParamNames->count() !== 3 ||
-        $requiredParamNames->at(0) !== \FactoryContainer::class ||
-        $requiredParamNames->at(1) !== Request::class ||
-        $requiredParamNames->at(2) !== Response::class) {
+    if ($requiredParamNames->count() !== 1 ||
+        $requiredParamNames->at(0) !== \FactoryContainer::class) {
       throw new \UnexpectedValueException(
         sprintf(
-          'Command handlers must except exactly 3 parameter of type: %s %s %s',
+          'Command handlers must except exactly 1 parameter of type %s',
           \FactoryContainer::class,
-          Request::class,
-          Response::class,
         ),
       );
     }
@@ -238,15 +232,6 @@ final class DefinitionParser {
     }
 
     $this->patterns->add($pattern.$verb);
-  }
-
-  private function checkReturn(?ScannedTypehint $returnType): void {
-    $typeText = $returnType?->getTypeName();
-    if ($typeText === null || ltrim($typeText, '\\') !== Response::class) {
-      throw new \UnexpectedValueException(
-        'You must specify a return type of '.Response::class,
-      );
-    }
   }
 
   private function extractMiddleware(

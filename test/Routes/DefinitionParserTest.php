@@ -14,74 +14,25 @@ class DefinitionParserTest {
 <?hh // strict
 
 <<Route('delete', 'path')>>
-function deleteHandler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{
-  return $rsp;
-}
+function deleteHandler(FactoryContainer $c): Handler {}
 
 <<Route('get', 'path')>>
-function getHandler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{
-  return $rsp;
-}
+function getHandler(FactoryContainer $c) : Handler {}
 
 <<Route('head', 'path')>>
-function headHandler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{
-  return $rsp;
-}
+function headHandler(FactoryContainer $c) : Handler {}
 
 <<Route('options', 'path')>>
-function optionsHandler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{
-  return $rsp;
-}
+function optionsHandler(FactoryContainer $c) : Handler {}
 
 <<Route('patch', 'path')>>
-function patchHandler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{
-  return $rsp;
-}
+function patchHandler(FactoryContainer $c) : Handler {}
 
 <<Route('post', 'path')>>
-function postHandler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{
-  return $rsp;
-}
+function postHandler(FactoryContainer $c) : Handler {}
 
 <<Route('put', 'path')>>
-function putHandler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{
-  return $rsp;
-}
+function putHandler(FactoryContainer $c) : Handler {}
 Hack;
 
     $parser = $this->parse($code);
@@ -105,12 +56,7 @@ Hack;
     $code = <<<'Hack'
 <?hh
 <<Route('strange', '/')>>
-function handler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{}
+function handler(FactoryContainer $c) : Handler {}
 Hack;
 
     $parser = $this->parse($code);
@@ -125,12 +71,7 @@ Hack;
     $code = <<<'Hack'
 <?hh
 <<Route('/some/pattern')>>
-function handler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{}
+function handler(FactoryContainer $c) : Handler {}
 Hack;
 
     $parser = $this->parse($code);
@@ -152,12 +93,7 @@ Hack;
 class RouteHandler
 {
   <<Route('/some/pattern')>>
-  public static function handler(
-    \FactoryContainer $c,
-    HackPack\HackMini\Message\Request $req,
-    HackPack\HackMini\Message\Response $rsp,
-  ) : HackPack\HackMini\Message\Response
-  {}
+  public static function handler(FactoryContainer $c) : self {}
 }
 Hack;
 
@@ -180,12 +116,7 @@ Hack;
 class RouteHandler
 {
   <<Route('/some/pattern')>>
-  public function handler(
-    \FactoryContainer $c,
-    HackPack\HackMini\Message\Request $req,
-    HackPack\HackMini\Message\Response $rsp,
-  ) : HackPack\HackMini\Message\Response
-  {}
+  public function handler(FactoryContainer $c) : Handler {}
 }
 Hack;
 
@@ -202,12 +133,7 @@ Hack;
     $code = <<<'Hack'
 <?hh
 <<Route('/'), UseMiddleware('some middleware', 'then some other middleware')>>
-function handler(
-  \FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{}
+function handler(FactoryContainer $c) : Handler {}
 Hack;
 
     $parser = $this->parse($code);
@@ -228,17 +154,13 @@ namespace Some\NS;
 use FactoryContainer;
 
 <<Route('/')>>
-function handler(
-  FactoryContainer $c,
-  HackPack\HackMini\Message\Request $req,
-  HackPack\HackMini\Message\Response $rsp,
-) : HackPack\HackMini\Message\Response
-{}
+function handler(FactoryContainer $c): \Handler {}
 Hack;
     $parser = $this->parse($code);
     $assert->int($parser->failures()->count())->eq(0);
     $assert->int($parser->routes()->count())->eq(1);
   }
+  
   private function parse(string $code): DefinitionParser {
     $hackParser = FileParser::FromData($code);
     return new DefinitionParser(
