@@ -13,12 +13,15 @@ use HackPack\HackMini\Message\RestMethod;
 use HackPack\HackMini\Message\StringBody;
 use HackPack\HackMini\Message\Uri;
 use HackPack\HackMini\Middleware\Web\Handler;
+use HackPack\HackMini\Middleware\Web\HandlerFactory;
 use HackPack\HackMini\Router\MissingWebHandler;
 use HackPack\HackMini\Router\Web;
 use HackPack\HackMini\Test\Doubles\MiddlewareSpy;
+use HackPack\HackMini\Test\Doubles\ClosureHandler;
 
 class WebTest {
   private int $handlerRunCount = 0;
+  private int $factoryRunCount = 0;
 
   private function buildRequest(string $path = '/'): Request {
     return new Request(
@@ -31,11 +34,13 @@ class WebTest {
     );
   }
 
-  private function buildHandler(
-  ): (function(FactoryContainer, Request, Response): Response) {
-    return ($c, $req, $rsp) ==> {
+  private function buildHandlerFactory(): HandlerFactory {
+    return ($c) ==> {
+      $this->factoryRunCount++;
+    return new ClosureHandler(($req, $rsp) ==> {
       $this->handlerRunCount++;
       return $rsp;
+    });
     };
   }
 
@@ -48,7 +53,7 @@ class WebTest {
         RestMethod::Any => Map {
           '/' => shape(
             'middleware' => Vector {},
-            'handler' => $this->buildHandler(),
+            'factory' => $this->buildHandlerFactory(),
           ),
         },
       },
@@ -60,18 +65,19 @@ class WebTest {
         $router->handle($this->buildRequest(), Response::factory());
       },
     )->willNotThrow();
+    $assert->int($this->factoryRunCount)->eq(1);
     $assert->int($this->handlerRunCount)->eq(1);
   }
 
   <<Test>>
   public function regexPath(Assert $assert): void {
 
-    $handler = ($c, $req, $rsp) ==> {
+    $handlerFactory = $c ==> new ClosureHandler(($req, $rsp) ==> {
       $assert->container($req->pathGroups())
         ->containsOnly(['/abc/def', 'abc', 'def']);
       $this->handlerRunCount++;
       return $rsp;
-    };
+    });
 
     $router = new Web(
       Vector {}, // Global middleware
@@ -79,7 +85,7 @@ class WebTest {
         RestMethod::Any => Map {
           '/([^/]*)/([^/]*)' => shape(
             'middleware' => Vector {},
-            'handler' => $handler,
+            'factory' => $handlerFactory,
           ),
         },
       },
@@ -106,7 +112,7 @@ class WebTest {
         RestMethod::Unknown => Map {
           '/' => shape(
             'middleware' => Vector {},
-            'handler' => $this->buildHandler(),
+            'factory' => $this->buildHandlerFactory(),
           ),
         },
       },
@@ -118,34 +124,37 @@ class WebTest {
         $router->handle($this->buildRequest(), Response::factory());
       },
     )->willThrowClass(MissingWebHandler::class);
+    $assert->int($this->factoryRunCount)->eq(0);
     $assert->int($this->handlerRunCount)->eq(0);
   }
 
   <<Test>>
   public function specificMethodUsedFirst(Assert $assert): void {
-    $handlersRun = Set {};
-    $anyHandler = ($c, $req, $rsp) ==> {
-      $handlersRun->add('any');
+    $methods = Set{};
+
+    $getHandlerFactory = $c ==> new ClosureHandler(($req, $rsp) ==> {
+      $methods->add('get');
       return $rsp;
-    };
-    $getHandler = ($c, $req, $rsp) ==> {
-      $handlersRun->add('get');
+    });
+
+    $anyHandlerFactory = $c ==> new ClosureHandler(($req, $rsp) ==> {
+      $methods->add('any');
       return $rsp;
-    };
+    });
 
     $router = new Web(
       Vector {}, // Global middleware
       Map {
-        RestMethod::Get => Map {
-          '/' => shape(
-            'middleware' => Vector {},
-            'handler' => $getHandler,
-          ),
-        },
         RestMethod::Any => Map {
           '/' => shape(
             'middleware' => Vector {},
-            'handler' => $anyHandler,
+            'factory' => $anyHandlerFactory,
+          ),
+        },
+        RestMethod::Get => Map {
+          '/' => shape(
+            'middleware' => Vector {},
+            'factory' => $getHandlerFactory,
           ),
         },
       },
@@ -157,34 +166,56 @@ class WebTest {
         $router->handle($this->buildRequest(), Response::factory());
       },
     )->willNotThrow();
-    $assert->container($handlersRun)->containsOnly(['get']);
+    $assert->container($methods)->containsOnly(['get']);
   }
 
   <<Test>>
   public function oneHandlerIsCalled(Assert $assert): void {
 
+    $router = new Web(
+      Vector {}, // Global middleware
+      Map {
+        RestMethod::Get => Map {
+          '/' => shape('middleware' => Vector {}, 'factory' => $this->buildHandlerFactory()),
+          '/stuff' => shape(
+            'middleware' => Vector {},
+            'factory' => $this->buildHandlerFactory(),
+          ),
+        },
+      },
+      new \FactoryContainer(),
+    );
+
+    $assert->whenCalled(
+      () ==> {
+        $router->handle($this->buildRequest(), Response::factory());
+      },
+    )->willNotThrow();
+    $assert->int($this->factoryRunCount)->eq(1);
+    $assert->int($this->handlerRunCount)->eq(1);
+  }
+
+  <<Test>>
+  public function correctParametersArePassed(Assert $assert): void {
+
     $request = $this->buildRequest();
     $response = Response::factory();
     $container = new FactoryContainer();
 
-    $handler = ($c, $req, $rsp) ==> {
+    $handlerFactory = $c ==> new ClosureHandler(($req, $rsp) ==> {
       // Make sure the handler was run
       $this->handlerRunCount++;
       // Response and container should be passed through
       $assert->mixed($rsp)->identicalTo($response);
       $assert->mixed($c)->identicalTo($container);
       return $rsp;
-    };
+    });
 
     $router = new Web(
       Vector {}, // Global middleware
       Map {
         RestMethod::Get => Map {
-          '/' => shape('middleware' => Vector {}, 'handler' => $handler),
-          '/stuff' => shape(
-            'middleware' => Vector {},
-            'handler' => $handler,
-          ),
+          '/' => shape('middleware' => Vector {}, 'factory' => $handlerFactory),
         },
       },
       $container,
@@ -212,14 +243,14 @@ class WebTest {
         RestMethod::Post => Map {
           '/' => shape(
             'middleware' => Vector {},
-            'handler' => $this->buildHandler(),
+            'factory' => $this->buildHandlerFactory(),
           ),
         },
         // Wrong path
         RestMethod::Get => Map {
           '/stuff' => shape(
             'middleware' => Vector {},
-            'handler' => $this->buildHandler(),
+            'factory' => $this->buildHandlerFactory(),
           ),
         },
       },
@@ -231,6 +262,7 @@ class WebTest {
         $router->handle($request, $response);
       },
     )->willThrowClass(MissingWebHandler::class);
+    $assert->int($this->factoryRunCount)->eq(0);
     $assert->int($this->handlerRunCount)->eq(0);
   }
 
@@ -256,7 +288,7 @@ class WebTest {
         RestMethod::Get => Map {
           '/stuff' => shape(
             'middleware' => Vector {},
-            'handler' => $this->buildHandler(),
+            'factory' => $this->buildHandlerFactory(),
           ),
         },
       },
@@ -312,7 +344,7 @@ class WebTest {
         RestMethod::Get => Map {
           '/' => shape(
             'middleware' => Vector {($c) ==> $l1, ($c) ==> $l2},
-            'handler' => $this->buildHandler(),
+            'factory' => $this->buildHandlerFactory(),
           ),
         },
       },

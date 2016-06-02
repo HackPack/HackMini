@@ -160,7 +160,7 @@ Hack;
     $assert->int($parser->failures()->count())->eq(0);
     $assert->int($parser->routes()->count())->eq(1);
   }
-  
+
   private function parse(string $code): DefinitionParser {
     $hackParser = FileParser::FromData($code);
     return new DefinitionParser(

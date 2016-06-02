@@ -8,6 +8,7 @@ use HackPack\HackMini\Message\Request;
 use HackPack\HackMini\Message\Response;
 use HackPack\HackMini\Message\RestMethod;
 use HackPack\HackMini\Middleware\Web\Handler;
+use HackPack\HackMini\Middleware\Web\HandlerFactory;
 
 final class Web {
 
@@ -24,11 +25,11 @@ final class Web {
     private Map<RestMethod,
     Map<string,
     shape(
-      'handler' => Handler,
+      'factory' => HandlerFactory,
       'middleware' => Vector<MiddlewareFactory<Request,
       Response,
       Response>>,
-    )>> $handlers,
+    )>> $factories,
     private \FactoryContainer $c,
   ) {
     $this->stack->addAll($globalMiddleware);
@@ -51,36 +52,38 @@ final class Web {
     'middleware' => Vector<MiddlewareFactory<Request, Response, Response>>,
   ) {
     // Look for the specific request method
-    $handler = $this->match($req, $this->handlers->get($req->getMethod()));
+    $factory = $this->match($req, $this->factories->get($req->getMethod()));
 
     // If not found, look for handler that can handle any request
-    if ($handler === null && $req->getMethod() !== RestMethod::Any) {
-      $handler = $this->match($req, $this->handlers->get(RestMethod::Any));
+    if ($factory === null && $req->getMethod() !== RestMethod::Any) {
+      $factory = $this->match($req, $this->factories->get(RestMethod::Any));
     }
 
-    // If no handlers were found, throw and exception.
-    if ($handler === null) {
-      $handler = shape(
+    // If no handlers were found, throw an exception.
+    if ($factory === null) {
+      return shape(
         'middleware' => Vector {},
-        'handler' => ($c, $req, $rsp) ==> {
-          throw new MissingWebHandler($req);
-        },
+        'handler' => new HandleMissingHandler(),
       );
     }
-    return $handler;
+
+    return shape(
+      'middleware' => $factory['middleware'],
+      'handler' => $factory['factory']($this->c),
+    );
   }
 
   private function match(
     Request $req,
     ?Map<string,
     shape(
-      'handler' => Handler,
+      'factory' => HandlerFactory,
       'middleware' => Vector<MiddlewareFactory<Request,
       Response,
       Response>>,
     )> $handlerList,
   ): ?shape(
-    'handler' => Handler,
+    'factory' => HandlerFactory,
     'middleware' => Vector<MiddlewareFactory<Request, Response, Response>>,
   ) {
     if ($handlerList === null) {
@@ -106,7 +109,7 @@ final class Web {
     Response $rsp,
   ): Response {
     if ($this->stack->isEmpty()) {
-      return $handler($this->c, $req, $rsp);
+      return $handler->handle($req, $rsp);
     }
 
     $current = array_shift($this->stack);
